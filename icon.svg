@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#080808"/>
+  <rect width="512" height="512" rx="80" fill="#e8c547" opacity="0.1"/>
+  <!-- Troféu -->
+  <path d="M176 120 h160 v140 c0 60-40 100-80 110 c-40-10-80-50-80-110 Z" fill="none" stroke="#e8c547" stroke-width="24" stroke-linejoin="round"/>
+  <!-- Alças do troféu -->
+  <path d="M176 150 c-60 0-60 80 0 80" fill="none" stroke="#e8c547" stroke-width="20" stroke-linecap="round"/>
+  <path d="M336 150 c60 0 60 80 0 80" fill="none" stroke="#e8c547" stroke-width="20" stroke-linecap="round"/>
+  <!-- Base -->
+  <line x1="256" y1="370" x2="256" y2="410" stroke="#e8c547" stroke-width="20" stroke-linecap="round"/>
+  <rect x="180" y="408" width="152" height="24" rx="12" fill="#e8c547"/>
+  <!-- Estrela dentro -->
+  <text x="256" y="295" font-family="monospace" font-size="80" text-anchor="middle" fill="#e8c547">★</text>
+</svg>

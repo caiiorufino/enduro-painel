@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Enduro Painel">
+<meta name="theme-color" content="#e8c547">
+<title>Enduro Timer — Painel</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{--yellow:#e8c547;--green:#00ff88;--orange:#ff6b00;--bg:#080808;--s:#0d0d0d;--b:#1a1a1a;--b2:#2a2a2a;--m:#555}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:60px}
+
+  /* ── LOGIN ── */
+  .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .login-card{width:100%;max-width:380px}
+  .login-logo{text-align:center;margin-bottom:32px}
+  .login-logo-label{font-size:10px;color:#444;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+  .login-logo-title{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:var(--yellow);letter-spacing:1px}
+  .login-logo-sub{font-size:13px;color:#444;margin-top:4px}
+  .login-box{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:28px}
+  .login-hint{text-align:center;margin-top:14px;font-size:11px;color:#2a2a2a}
+
+  /* ── TOPBAR ── */
+  .topbar{position:sticky;top:0;z-index:50;background:#0a0a0a;border-bottom:1px solid #141414;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .tb-left{display:flex;align-items:center;gap:12px}
+  .tb-label{font-size:10px;color:var(--m);letter-spacing:3px;text-transform:uppercase}
+  .tb-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;color:var(--yellow);font-weight:800}
+  .tb-org{font-size:11px;color:#444;margin-top:1px}
+  .tb-right{display:flex;gap:8px;align-items:center}
+  .live-badge{padding:6px 12px;border-radius:8px;background:#0a0a0a;border:1px solid #1a1a1a;font-size:11px;color:#333;font-weight:600;transition:all .3s}
+  .live-badge.flash{background:#00ff8822;border-color:#00ff8866;color:var(--green)}
+  .tb-btn{padding:6px 14px;border-radius:8px;background:#1a1a1a;border:1px solid #2a2a2a;color:#666;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+  .tb-btn.yellow{background:#e8c54718;border-color:#e8c54744;color:var(--yellow)}
+  .tb-btn.red{background:#ff444418;border-color:#ff444433;color:#ff6666}
+
+  /* ── STATS ── */
+  .stats{display:flex;gap:10px;padding:20px 24px 0;overflow-x:auto}
+  .stat{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:16px 18px;flex:1;min-width:110px}
+  .stat-lbl{font-size:10px;color:#444;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+  .stat-val{font-size:28px;font-weight:800;font-family:'Barlow Condensed',sans-serif;line-height:1}
+  .stat-sub{font-size:11px;color:#444;margin-top:4px}
+
+  /* ── TABS ── */
+  .tabs{display:flex;padding:20px 24px 0;border-bottom:1px solid #111;overflow-x:auto}
+  .tab{padding:10px 18px;border:none;background:none;cursor:pointer;color:#444;font-weight:500;font-size:14px;border-bottom:2px solid transparent;transition:all .2s;font-family:inherit;white-space:nowrap}
+  .tab.on{color:var(--yellow);font-weight:700;border-bottom-color:var(--yellow)}
+  .tab.admin-tab{color:#ff6b0088}
+  .tab.admin-tab.on{color:var(--orange);border-bottom-color:var(--orange)}
+  .content{padding:24px}
+  .screen{display:none}
+  .screen.on{display:block}
+
+  /* ── FORMS ── */
+  .fl{font-size:11px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block}
+  .fi{width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:16px;transition:border-color .2s}
+  .fi:focus{border-color:var(--yellow)}
+  select.fi option{background:#111}
+  .btn-save{width:100%;padding:12px;border-radius:12px;border:none;background:var(--yellow);color:#000;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:all .2s}
+  .btn-save.ok{background:var(--green)}
+  .btn-save:disabled{background:#1a1a1a;color:#333;cursor:not-allowed}
+
+  /* ── PILLS ── */
+  .pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:24px}
+  .pill{padding:6px 16px;border-radius:99px;border:1px solid #2a2a2a;background:transparent;color:#555;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap}
+  .pill.on{border-color:#e8c54799;background:#e8c54718;color:var(--yellow)}
+
+  /* ── RANKING ── */
+  .rtable{background:#0d0d0d;border-radius:16px;border:1px solid #1a1a1a;overflow:hidden;overflow-x:auto}
+  .rhead{display:grid;padding:10px 16px;border-bottom:1px solid #1a1a1a;font-size:10px;color:#444;letter-spacing:2px;text-transform:uppercase}
+  .rrow{display:grid;padding:13px 16px;border-bottom:1px solid #111;align-items:center}
+  .rrow:last-child{border-bottom:none}
+  .rrow.gold{background:#e8c54708}
+
+  /* ── CARDS ── */
+  .list-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .count-lbl{font-size:13px;color:#555}
+  .btn-add{padding:9px 18px;border-radius:10px;border:1px solid #e8c54744;background:#e8c54712;color:var(--yellow);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+  .card{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .card-l{display:flex;align-items:center;gap:14px}
+  .badge{width:38px;height:38px;border-radius:10px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--yellow);font-family:monospace}
+  .card-name{font-size:14px;font-weight:600}
+  .card-meta{font-size:11px;color:#555;margin-top:2px}
+  .card-r{display:flex;gap:8px}
+  .btn-sm{padding:7px 14px;border-radius:8px;border:1px solid #2a2a2a;background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:#888}
+  .btn-del{color:#555}
+  .admin-badge{display:inline-block;padding:2px 8px;border-radius:4px;background:#ff6b0022;border:1px solid #ff6b0044;color:var(--orange);font-size:10px;font-weight:700;margin-left:6px}
+
+  /* ── MODAL ── */
+  .overlay{position:fixed;inset:0;background:#000c;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+  .overlay.open{display:flex}
+  .modal{background:#111;border:1px solid #2a2a2a;border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:mIn .2s ease}
+  .modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+  .modal-title{font-size:18px;font-weight:700}
+  .modal-x{background:none;border:none;color:#555;font-size:20px;cursor:pointer}
+  .modal-hint{font-size:12px;color:#555;margin-bottom:20px}
+  .modal-hint span{color:var(--yellow);font-family:monospace}
+
+  /* ── NOTIF ── */
+  .notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px 20px;font-size:13px;font-weight:600;color:#fff;z-index:200;transition:transform .3s ease;pointer-events:none;white-space:nowrap}
+  .notif.show{transform:translateX(-50%) translateY(0)}
+  .notif.green{border-color:#00ff8844;color:var(--green)}
+
+  /* ── CHECKLIST ── */
+  .chk{margin-top:28px;padding:20px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px}
+  .chk-title{font-size:12px;color:#555;margin-bottom:12px;letter-spacing:1px}
+  .chk-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+
+  @keyframes mIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.3)}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-track{background:#111}
+  ::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+  button:active{opacity:.85}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div class="login-screen" id="secLogin">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-label">MTB Enduro</div>
+      <div class="login-logo-title">PAINEL</div>
+      <div class="login-logo-sub">Acesso restrito ao organizador</div>
+    </div>
+    <div class="login-box">
+      <label class="fl">Usuário</label>
+      <input class="fi" id="loginEmail" placeholder="Ex: admin">
+      <label class="fl">Senha</label>
+      <input class="fi" type="password" id="loginPass" placeholder="••••••••">
+      <div id="loginErr" style="font-size:12px;color:#ff4444;margin-bottom:12px;display:none">E-mail ou senha incorretos.</div>
+      <button class="btn-save" onclick="doLogin()" id="btnLogin">Entrar</button>
+    </div>
+    <div class="login-hint">Conta admin padrão: admin / 1234</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="secApp" style="display:none">
+
+<div class="topbar">
+  <div class="tb-left">
+    <div>
+      <div class="tb-label">Painel do Organizador</div>
+      <div class="tb-title" id="evtTitle">Enduro Timer</div>
+      <div class="tb-org" id="tbOrg"></div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn yellow" onclick="gerarPDF()">📄 PDF</button>
+    <button class="tb-btn" onclick="openChangePass()">🔑</button>
+    <button class="tb-btn red" onclick="doLogout()">Sair</button>
+    <div class="live-badge" id="liveBadge">○ AO VIVO</div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-lbl">Atletas</div><div class="stat-val" id="stA">—</div><div class="stat-sub">inscritos</div></div>
+  <div class="stat"><div class="stat-lbl">Finalizaram</div><div class="stat-val" id="stF" style="color:var(--green)">—</div><div class="stat-sub">todos stages</div></div>
+  <div class="stat"><div class="stat-lbl">Stages</div><div class="stat-val" id="stS" style="color:var(--yellow)">—</div><div class="stat-sub">configurados</div></div>
+  <div class="stat"><div class="stat-lbl">Líder</div><div class="stat-val" id="stL" style="color:var(--yellow);font-size:18px">—</div><div class="stat-sub" id="stLT">—</div></div>
+</div>
+
+<div class="tabs" id="tabsBar">
+  <button class="tab on"  onclick="switchTab('ranking',this)">🏆 Ranking</button>
+  <button class="tab"     onclick="switchTab('atletas',this)">🚵 Atletas</button>
+  <button class="tab"     onclick="switchTab('stages',this)">🏔 Stages</button>
+  <button class="tab"     onclick="switchTab('categorias',this)">🏷️ Categorias</button>
+  <button class="tab"     onclick="switchTab('evento',this)">⚙️ Evento</button>
+</div>
+
+<div class="content">
+  <div class="screen on" id="sc-ranking">
+    <div class="pills" id="catPills"></div>
+    <div class="rtable" id="rankTable"></div>
+  </div>
+  <div class="screen" id="sc-atletas">
+    <div class="list-hd"><div class="count-lbl" id="athCount">—</div><button class="btn-add" onclick="openM('mAth')">+ Adicionar atleta</button></div>
+    <div id="athList"></div>
+  </div>
+  <div class="screen" id="sc-stages">
+    <div class="list-hd"><div class="count-lbl" id="stgCount">—</div><button class="btn-add" onclick="openM('mStg')">+ Novo Stage</button></div>
+    <div id="stgList"></div>
+  </div>
+  <div class="screen" id="sc-categorias">
+    <div class="list-hd"><div class="count-lbl" id="catCount">—</div><button class="btn-add" onclick="openM('mCat')">+ Nova Categoria</button></div>
+    <div id="catList"></div>
+  </div>
+  <div class="screen" id="sc-evento">
+    <div style="max-width:480px">
+      <label class="fl">Nome do Evento</label><input class="fi" id="evName">
+      <label class="fl">Data</label><input class="fi" type="date" id="evDate">
+      <label class="fl">Local</label><input class="fi" id="evLoc" placeholder="Cidade, Estado">
+      <button class="btn-save" id="btnSave" onclick="saveEvent()">Salvar Configurações</button>
+      <div class="chk">
+        <div class="chk-title">PRÓXIMOS PASSOS</div>
+        <div class="chk-item"><span style="font-size:18px">📡</span><div><div style="font-size:13px;font-weight:600;color:#ccc">Configurar Beacons BLE</div><div style="font-size:11px;color:#444">Instalar beacon na largada e chegada de cada stage</div></div></div>
+        <div class="chk-item"><span style="font-size:18px">📱</span><div><div style="font-size:13px;font-weight:600;color:#ccc">Distribuir App aos Atletas</div><div style="font-size:11px;color:#444">Enviar link do atleta-app pelo WhatsApp</div></div></div>
+        <div class="chk-item"><span style="font-size:18px">🏁</span><div><div style="font-size:13px;font-weight:600;color:#ccc">Testar stage completo</div><div style="font-size:11px;color:#444">Largada → cronômetro → chegada → ranking atualiza</div></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- ADMIN: Organizadores -->
+  <div class="screen" id="sc-admin">
+    <div class="list-hd"><div class="count-lbl" id="orgCount">—</div><button class="btn-add" onclick="openM('mOrg')">+ Novo Organizador</button></div>
+    <div id="orgList"></div>
+  </div>
+</div>
+
+</div><!-- /secApp -->
+
+<!-- MODAIS -->
+<div class="overlay" id="mAth" onclick="closeM('mAth')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title">Novo Atleta</div><button class="modal-x" onclick="closeM('mAth')">✕</button></div>
+    <label class="fl">Nome completo</label><input class="fi" id="nName" placeholder="Ex: João Silva">
+    <label class="fl">Número</label><input class="fi" id="nNum" placeholder="Ex: 42">
+    <label class="fl">PIN (4 dígitos)</label><input class="fi" id="nPin" placeholder="Ex: 7391" maxlength="4">
+    <label class="fl">Categoria</label><select class="fi" id="nCat"></select>
+    <button class="btn-save" onclick="addAthlete()">Cadastrar Atleta</button>
+  </div>
+</div>
+
+<div class="overlay" id="mTimes" onclick="closeM('mTimes')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title" id="mTimesTitle">Tempos</div><button class="modal-x" onclick="closeM('mTimes')">✕</button></div>
+    <div class="modal-hint">Formato: <span>mm:ss.mmm</span> ex: 02:43.200</div>
+    <div id="timesInputs"></div>
+    <button class="btn-save" onclick="saveTimes()">Salvar Tempos</button>
+  </div>
+</div>
+
+<div class="overlay" id="mStg" onclick="closeM('mStg')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title">Novo Stage</div><button class="modal-x" onclick="closeM('mStg')">✕</button></div>
+    <label class="fl">Nome do Stage</label><input class="fi" id="sName" placeholder="Ex: Descida do Tomate">
+    <label class="fl">Distância</label><input class="fi" id="sDist" placeholder="Ex: 2.4km">
+    <label class="fl">Desnível</label><input class="fi" id="sDrop" placeholder="Ex: 320m">
+    <button class="btn-save" onclick="addStage()">Adicionar Stage</button>
+  </div>
+</div>
+
+<div class="overlay" id="mCat" onclick="closeM('mCat')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title">Nova Categoria</div><button class="modal-x" onclick="closeM('mCat')">✕</button></div>
+    <label class="fl">Nome da categoria</label><input class="fi" id="cName" placeholder="Ex: Master B">
+    <button class="btn-save" onclick="addCategory()">Adicionar Categoria</button>
+  </div>
+</div>
+
+<div class="overlay" id="mOrg" onclick="closeM('mOrg')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
+    <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
+    <label class="fl">Usuário</label><input class="fi" id="oEmail" placeholder="Ex: carlos">
+    <label class="fl">Senha inicial</label><input class="fi" id="oPass" placeholder="Ex: enduro2025">
+    <label class="fl">Código do Evento</label><input class="fi" id="oCode" placeholder="Ex: ENDURO25" style="text-transform:uppercase">
+    <button class="btn-save" onclick="addOrganizer()">Criar Organizador</button>
+  </div>
+</div>
+
+<div class="overlay" id="mChangePass" onclick="closeM('mChangePass')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><div class="modal-title">Alterar Senha</div><button class="modal-x" onclick="closeM('mChangePass')">✕</button></div>
+    <label class="fl">Nova senha</label><input class="fi" type="password" id="newPass1" placeholder="••••••••">
+    <label class="fl">Confirmar nova senha</label><input class="fi" type="password" id="newPass2" placeholder="••••••••">
+    <button class="btn-save" onclick="changePassword()">Salvar Nova Senha</button>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(
+  'https://mhqutsptyxuqdabtiosm.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocXV0c3B0eXh1cWRhYnRpb3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTY5MTQsImV4cCI6MjA5MjQzMjkxNH0.fYM3z8G0HL6Zer7qj8HjqGIncZ4YRjCT7VSmzmFrvLA'
+);
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────────
+let currentOrg  = null; // organizador logado
+let athletes=[], stages=[], times=[], categories=[], organizers=[];
+let currentCat  = "Todos";
+let editingAthId= null;
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function fmt(ms){if(!ms)return"--:--.---";const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),r=ms%1000;return`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${String(r).padStart(3,"0")}`}
+function fmtS(ms){if(!ms)return"—";return`${String(Math.floor(ms/60000)).padStart(2,"0")}:${String(Math.floor((ms%60000)/1000)).padStart(2,"0")}`}
+function parseFmt(str){if(!str||!str.trim())return null;const m=str.trim().match(/^(\d+):(\d{2})\.(\d{1,3})$/);if(m)return+m[1]*60000+ +m[2]*1000+ +m[3].padEnd(3,"0");return null}
+function totalMs(a){return stages.reduce((acc,s)=>{const t=times.find(x=>x.athlete_id===a.id&&x.stage_id===s.id);return t?acc+t.time_ms:acc},0)}
+function doneCount(a){return stages.filter(s=>times.find(t=>t.athlete_id===a.id&&t.stage_id===s.id)).length}
+function buildRanking(cat){
+  const list=cat==="Todos"?athletes:athletes.filter(a=>a.category===cat);
+  return list.map(a=>({...a,total:totalMs(a),done:doneCount(a)})).sort((a,b)=>{if(a.done!==b.done)return b.done-a.done;if(!a.total)return 1;if(!b.total)return-1;return a.total-b.total});
+}
+function toast(msg,green=false){
+  const n=document.getElementById("notif");
+  n.textContent=msg;n.className="notif"+(green?" green":"")+" show";
+  setTimeout(()=>n.classList.remove("show"),3000);
+}
+function openM(id){document.getElementById(id).classList.add("open")}
+function closeM(id){document.getElementById(id).classList.remove("open")}
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const pass =document.getElementById("loginPass").value.trim();
+  if(!email||!pass)return;
+  const btn=document.getElementById("btnLogin");
+  btn.disabled=true;btn.textContent="Verificando...";
+
+  const{data,error}=await sb.from("organizers").select("*").eq("username",email).eq("password",pass).single();
+  if(error||!data){
+    document.getElementById("loginErr").style.display="block";
+    btn.disabled=false;btn.textContent="Entrar";
+    return;
+  }
+  currentOrg=data;
+  sessionStorage.setItem("enduro_org",JSON.stringify(data));
+  showApp();
+}
+
+function showApp(){
+  document.getElementById("secLogin").style.display="none";
+  document.getElementById("secApp").style.display="block";
+  const codeStr = currentOrg.event_code ? ` · Código: ${currentOrg.event_code}` : "";
+  document.getElementById("tbOrg").textContent=currentOrg.name+(currentOrg.is_admin?" · Admin":codeStr);
+
+  if(currentOrg.is_admin){
+    // Admin vê só o painel de organizadores — esconde tudo mais
+    document.getElementById("tabsBar").style.display="none";
+    document.querySelector(".stats").style.display="none";
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+    document.getElementById("sc-admin").classList.add("on");
+    document.getElementById("evtTitle").textContent="Administração";
+    loadOrganizers();
+  } else {
+    loadAll();
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem("enduro_org");
+  currentOrg=null;
+  athletes=[];stages=[];times=[];categories=[];organizers=[];
+  // Restaura tabs e stats para o próximo login
+  document.getElementById("tabsBar").style.display="flex";
+  document.querySelector(".stats").style.display="flex";
+  // Restaura tab ranking como ativa
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  document.getElementById("sc-ranking").classList.add("on");
+  document.querySelector(".tab").classList.add("on");
+  // Remove aba admin se existir
+  document.querySelectorAll(".admin-tab").forEach(t=>t.remove());
+  document.getElementById("secApp").style.display="none";
+  document.getElementById("secLogin").style.display="flex";
+  document.getElementById("loginEmail").value="";
+  document.getElementById("loginPass").value="";
+  document.getElementById("loginErr").style.display="none";
+}
+
+function openChangePass(){openM("mChangePass")}
+
+async function changePassword(){
+  const p1=document.getElementById("newPass1").value.trim();
+  const p2=document.getElementById("newPass2").value.trim();
+  if(!p1||p1.length<4){toast("Senha muito curta (mín. 4 caracteres)");return}
+  if(p1!==p2){toast("Senhas não coincidem");return}
+  const{error}=await sb.from("organizers").update({password:p1}).eq("id",currentOrg.id);
+  if(!error){
+    currentOrg.password=p1;
+    sessionStorage.setItem("enduro_org",JSON.stringify(currentOrg));
+    closeM("mChangePass");
+    toast("✅ Senha alterada!",true);
+  } else toast("Erro ao alterar senha");
+}
+
+// ─── LOAD ─────────────────────────────────────────────────────────────────────
+async function loadAll(){
+  // Admin vê tudo, organizador vê só os seus
+  const orgFilter = currentOrg.is_admin ? null : currentOrg.id;
+
+  let qA=sb.from("athletes").select("*").order("number");
+  let qS=sb.from("stages").select("*").order("id");
+  let qT=sb.from("times").select("*");
+  let qC=sb.from("categories").select("*").order("name");
+
+  if(orgFilter){
+    qA=qA.eq("organizer_id",orgFilter);
+    qS=qS.eq("organizer_id",orgFilter);
+    qT=qT.eq("organizer_id",orgFilter);
+    qC=qC.eq("organizer_id",orgFilter);
+  }
+
+  const[{data:a},{data:s},{data:t},{data:c}]=await Promise.all([qA,qS,qT,qC]);
+  athletes=a||[]; stages=s||[]; times=t||[]; categories=c||[];
+
+  if(currentOrg.is_admin){
+    const{data:o}=await sb.from("organizers").select("*").order("name");
+    organizers=o||[];
+  }
+
+  renderAll();
+  subscribeRealtime();
+}
+
+function subscribeRealtime(){
+  sb.channel("painel-"+currentOrg.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"times"},p=>{
+      if(p.eventType==="INSERT"){
+        // Filtra por organizador
+        if(!currentOrg.is_admin && p.new.organizer_id !== currentOrg.id) return;
+        times=times.filter(t=>!(t.athlete_id===p.new.athlete_id&&t.stage_id===p.new.stage_id));
+        times.push(p.new);
+        flashLive(); renderAll();
+        const ath=athletes.find(a=>a.id===p.new.athlete_id);
+        const stg=stages.find(s=>s.id===p.new.stage_id);
+        const stgIdx=stages.findIndex(s=>s.id===p.new.stage_id)+1;
+        toast(`✅ ${ath?.name||"Atleta"} — S${stgIdx}: ${fmt(p.new.time_ms)}`,true);
+      }
+      if(p.eventType==="DELETE"){times=times.filter(t=>t.id!==p.old.id);renderAll()}
+    }).subscribe();
+}
+
+function flashLive(){
+  const b=document.getElementById("liveBadge");
+  b.classList.add("flash");b.textContent="● AO VIVO";
+  setTimeout(()=>{b.classList.remove("flash");b.textContent="○ AO VIVO"},2000);
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories();if(currentOrg?.is_admin)renderOrganizers()}
+
+function renderStats(){
+  document.getElementById("stA").textContent=athletes.length;
+  document.getElementById("stF").textContent=athletes.filter(a=>doneCount(a)===stages.length&&stages.length>0).length;
+  document.getElementById("stS").textContent=stages.length;
+  const r=buildRanking("Todos");
+  if(r[0]?.total){document.getElementById("stL").textContent=r[0].name.split(" ")[0];document.getElementById("stLT").textContent=fmt(r[0].total)}
+}
+
+function renderRanking(){
+  const cats=["Todos",...(categories.length?categories.map(c=>c.name):[...new Set(athletes.map(a=>a.category).filter(Boolean))]).filter(c=>athletes.some(a=>a.category===c))];
+  document.getElementById("catPills").innerHTML=cats.map(c=>`<button class="pill${c===currentCat?" on":""}" onclick="setCat('${c}')">${c}</button>`).join("");
+  const rank=buildRanking(currentCat);
+  const leader=rank[0]?.total||0;
+  const medals=["🥇","🥈","🥉"];
+  const cols=`44px 1fr 80px ${stages.map(()=>"80px").join(" ")} 110px`;
+  const head=`<div class="rhead" style="grid-template-columns:${cols}"><span>#</span><span>Atleta</span><span>Cat.</span>${stages.map((s,i)=>`<span style="text-align:right">S${i+1}</span>`).join("")}<span style="text-align:right">Total</span></div>`;
+  const rows=rank.map((a,i)=>{
+    const gap=a.total&&leader?a.total-leader:null;
+    const stgCols=stages.map(s=>{
+      const t=times.find(x=>Number(x.athlete_id)===Number(a.id)&&Number(x.stage_id)===Number(s.id));
+      return`<span style="font-size:12px;font-family:monospace;text-align:right;color:${t?"#ccc":"#333"}">${t?fmtS(t.time_ms):"—"}</span>`;
+    }).join("");
+    return`<div class="rrow${i===0?" gold":""}" style="grid-template-columns:${cols}">
+      <span style="font-size:14px;font-weight:700;color:${i<3?"var(--yellow)":"#444"}">${medals[i]||i+1}</span>
+      <div><div style="font-size:14px;font-weight:600">${a.name}</div><div style="font-size:11px;color:#444">#${a.number}·${a.done}/${stages.length}</div></div>
+      <span style="font-size:10px;color:#555">${a.category}</span>
+      ${stgCols}
+      <div style="text-align:right"><div style="font-size:14px;font-weight:700;font-family:monospace;color:${i===0?"var(--yellow)":"#fff"}">${a.total?fmt(a.total):"—"}</div>${gap>0?`<div style="font-size:10px;color:#555">+${fmtS(gap)}</div>`:""}</div>
+    </div>`;
+  }).join("");
+  document.getElementById("rankTable").innerHTML=head+rows;
+}
+function setCat(c){currentCat=c;renderRanking()}
+
+function renderAthletes(){
+  document.getElementById("athCount").textContent=`${athletes.length} atletas inscritos`;
+  document.getElementById("athList").innerHTML=athletes.map(a=>`
+    <div class="card">
+      <div class="card-l"><div class="badge">#${a.number}</div>
+        <div><div class="card-name">${a.name}</div>
+        <div class="card-meta">${a.category}·${doneCount(a)}/${stages.length} stages · PIN: <span style="font-family:monospace;color:var(--yellow)">${a.pin||"—"}</span></div></div>
+      </div>
+      <div class="card-r"><button class="btn-sm" onclick="openEditTimes(${a.id})">⏱</button><button class="btn-sm btn-del" onclick="removeAthlete(${a.id})">✕</button></div>
+    </div>`).join("");
+  // Atualiza select de categorias
+  const sel=document.getElementById("nCat");
+  if(sel) sel.innerHTML=categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join("")||`<option>Sem categorias</option>`;
+}
+
+function renderStages(){
+  document.getElementById("stgCount").textContent=`${stages.length} stages`;
+  document.getElementById("stgList").innerHTML=stages.map((s,i)=>`
+    <div class="card">
+      <div class="card-l"><div class="badge" style="font-family:'Barlow Condensed',sans-serif;font-size:16px">S${i+1}</div>
+        <div><div class="card-name">${s.name}</div><div class="card-meta">${[s.distance,s.drop_meters?s.drop_meters+" desnível":""].filter(Boolean).join(" · ")}</div></div>
+      </div>
+      <div class="card-r"><div style="padding:4px 10px;border-radius:6px;background:#1a1a1a;font-size:11px;color:#e8c54788;font-family:monospace">S${i+1}-START/FINISH</div>
+      <button class="btn-sm btn-del" onclick="removeStage(${s.id})">✕</button></div>
+    </div>`).join("");
+}
+
+function renderCategories(){
+  const el=document.getElementById("catList");
+  if(!el)return;
+  document.getElementById("catCount").textContent=`${categories.length} categorias`;
+  if(!categories.length){el.innerHTML=`<div style="text-align:center;color:#444;font-size:13px;padding:30px">Nenhuma categoria cadastrada.</div>`;return}
+  el.innerHTML=categories.map(c=>`
+    <div class="card">
+      <div class="card-l"><div class="badge" style="font-size:18px">🏷️</div>
+        <div><div class="card-name">${c.name}</div><div class="card-meta">${athletes.filter(a=>a.category===c.name).length} atleta(s)</div></div>
+      </div>
+      <div class="card-r"><button class="btn-sm btn-del" onclick="removeCategory(${c.id},'${c.name}')">✕</button></div>
+    </div>`).join("");
+}
+
+function renderOrganizers(){
+  const el=document.getElementById("orgList");
+  if(!el)return;
+  const count=organizers.filter(o=>!o.is_admin).length;
+  document.getElementById("orgCount").textContent=`${count} organizador(es) cadastrado(s)`;
+  el.innerHTML=organizers.map(o=>`
+    <div class="card" style="${o.is_admin?"border-color:#ff6b0033;background:#ff6b0005":""}">
+      <div class="card-l">
+        <div class="badge" style="font-size:20px;background:${o.is_admin?"#ff6b0022":"#1a1a1a"}">${o.is_admin?"👑":"👤"}</div>
+        <div>
+          <div class="card-name">${o.name}${o.is_admin?'<span class="admin-badge">ADMIN</span>':""}</div>
+          <div class="card-meta">@${o.username}</div>
+          ${!o.is_admin?`
+          <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+            <span style="padding:2px 8px;border-radius:5px;background:#e8c54718;border:1px solid #e8c54733;font-size:10px;font-family:monospace;color:var(--yellow);font-weight:700">
+              🎯 ${o.event_code||"sem código"}
+            </span>
+          </div>`:""}
+        </div>
+      </div>
+      ${!o.is_admin?`
+      <div class="card-r">
+        <button class="btn-sm" onclick="resetPassword(${o.id},'${o.name}')" title="Resetar senha">🔑</button>
+        <button class="btn-sm btn-del" onclick="removeOrganizer(${o.id})" title="Remover">✕</button>
+      </div>`:""}
+    </div>`).join("");
+}
+
+// ─── ATLETAS ─────────────────────────────────────────────────────────────────
+async function addAthlete(){
+  const name=document.getElementById("nName").value.trim();
+  const number=document.getElementById("nNum").value.trim();
+  const pin=document.getElementById("nPin").value.trim();
+  const category=document.getElementById("nCat").value;
+  if(!name||!number||!pin){toast("Preencha todos os campos");return}
+  // Verifica número duplicado no mesmo evento
+  const duplicado=athletes.find(a=>a.number===number);
+  if(duplicado){toast(`⚠️ Número ${number} já está em uso por ${duplicado.name}`);return}
+  const{error}=await sb.from("athletes").insert({name,number,category,pin,organizer_id:currentOrg.id});
+  if(!error){closeM("mAth");toast("✅ Atleta cadastrado",true);await loadAll()}
+  else toast("Erro ao cadastrar atleta");
+}
+async function removeAthlete(id){
+  if(!confirm("Remover atleta?"))return;
+  await sb.from("times").delete().eq("athlete_id",id);
+  await sb.from("athletes").delete().eq("id",id);
+  athletes=athletes.filter(a=>a.id!==id);times=times.filter(t=>t.athlete_id!==id);
+  renderAll();toast("Atleta removido");
+}
+function openEditTimes(id){
+  const a=athletes.find(x=>x.id===id);
+  editingAthId=id;
+  document.getElementById("mTimesTitle").textContent=`Tempos — ${a.name}`;
+  document.getElementById("timesInputs").innerHTML=stages.map(s=>{
+    const t=times.find(x=>x.athlete_id===id&&x.stage_id===s.id);
+    return`<label class="fl">Stage ${stages.findIndex(x=>x.id===s.id)+1} — ${s.name}</label><input class="fi" id="ti_${s.id}" value="${t?fmt(t.time_ms):""}" placeholder="mm:ss.mmm ou vazio">`;
+  }).join("");
+  openM("mTimes");
+}
+async function saveTimes(){
+  for(const s of stages){
+    const val=document.getElementById(`ti_${s.id}`)?.value;
+    const ms=parseFmt(val);
+    const existing=times.find(t=>t.athlete_id===editingAthId&&t.stage_id===s.id);
+    if(ms&&!existing){const{data}=await sb.from("times").insert({athlete_id:editingAthId,stage_id:s.id,time_ms:ms,organizer_id:currentOrg.id}).select().single();if(data)times.push(data)}
+    else if(ms&&existing){await sb.from("times").update({time_ms:ms}).eq("id",existing.id);existing.time_ms=ms}
+    else if(!ms&&existing){await sb.from("times").delete().eq("id",existing.id);times=times.filter(t=>t.id!==existing.id)}
+  }
+  closeM("mTimes");renderAll();toast("✅ Tempos salvos",true);
+}
+
+// ─── STAGES ──────────────────────────────────────────────────────────────────
+async function addStage(){
+  const name=document.getElementById("sName").value.trim();
+  if(!name)return;
+  const{error}=await sb.from("stages").insert({name,distance:document.getElementById("sDist").value,drop_meters:document.getElementById("sDrop").value,organizer_id:currentOrg.id});
+  if(!error){closeM("mStg");toast("✅ Stage adicionado",true);await loadAll()}
+  else toast("Erro ao adicionar stage");
+}
+async function removeStage(id){
+  if(!confirm("Remover stage?"))return;
+  await sb.from("stages").delete().eq("id",id);
+  stages=stages.filter(s=>s.id!==id);times=times.filter(t=>t.stage_id!==id);
+  renderAll();toast("Stage removido");
+}
+
+// ─── CATEGORIAS ───────────────────────────────────────────────────────────────
+async function addCategory(){
+  const name=document.getElementById("cName").value.trim();
+  if(!name)return;
+  const{error}=await sb.from("categories").insert({name,organizer_id:currentOrg.id});
+  if(!error){closeM("mCat");document.getElementById("cName").value="";toast("✅ Categoria adicionada",true);await loadAll()}
+  else toast("Erro ao adicionar categoria");
+}
+async function removeCategory(id,name){
+  if(athletes.some(a=>a.category===name)){toast(`⚠️ Categoria em uso por ${athletes.filter(a=>a.category===name).length} atleta(s)`);return}
+  if(!confirm(`Remover "${name}"?`))return;
+  await sb.from("categories").delete().eq("id",id);
+  categories=categories.filter(c=>c.id!==id);renderAll();toast("Categoria removida");
+}
+
+// ─── ORGANIZADORES (admin) ───────────────────────────────────────────────────
+async function loadOrganizers(){
+  const{data}=await sb.from("organizers").select("*").order("name");
+  organizers=data||[];
+  renderOrganizers();
+}
+
+async function addOrganizer(){
+  const name=document.getElementById("oName").value.trim();
+  const email=document.getElementById("oEmail").value.trim().toLowerCase().replace(/\s+/g,"_");
+  const password=document.getElementById("oPass").value.trim();
+  const code=document.getElementById("oCode").value.trim().toUpperCase();
+  if(!name||!email||!password||!code){toast("Preencha todos os campos");return}
+  // Verifica duplicatas manualmente
+  const{data:dup}=await sb.from("organizers").select("id,username,event_code");
+  const emailUsado=dup&&dup.some(o=>o.username===email);
+  const codeUsado=dup&&dup.some(o=>o.event_code===code);
+  if(emailUsado){toast("⚠️ Usuário já cadastrado.");return}
+  if(codeUsado){toast("⚠️ Código de evento já em uso.");return}
+  const{error}=await sb.from("organizers").insert({name,username:email,password,is_admin:false,event_code:code});
+  if(!error){
+    closeM("mOrg");
+    ["oName","oEmail","oPass","oCode"].forEach(id=>document.getElementById(id).value="");
+    toast("✅ Organizador criado!",true);
+    await loadOrganizers();
+  } else {
+    toast("Erro ao criar organizador.");
+  }
+}
+async function removeOrganizer(id){
+  if(!confirm("Remover organizador?"))return;
+  await sb.from("organizers").delete().eq("id",id);
+  organizers=organizers.filter(o=>o.id!==id);renderOrganizers();toast("Organizador removido");
+}
+
+// ─── EVENTO ───────────────────────────────────────────────────────────────────
+function saveEvent(){
+  document.getElementById("evtTitle").textContent=document.getElementById("evName").value||"Enduro Timer";
+  const btn=document.getElementById("btnSave");btn.textContent="✓ Salvo!";btn.classList.add("ok");
+  setTimeout(()=>{btn.textContent="Salvar";btn.classList.remove("ok")},2000);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(id,el){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  document.getElementById("sc-"+id).classList.add("on");
+  el.classList.add("on");
+}
+
+// ─── PDF ──────────────────────────────────────────────────────────────────────
+function gerarPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  const eventName=document.getElementById("evtTitle").textContent||"Enduro Timer";
+  const dateStr=new Date().toLocaleDateString("pt-BR");
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  const DARK=[8,8,8],ORANGE=[232,197,71],WHITE=[255,255,255],GRAY1=[20,20,20],GRAY2=[40,40,40],GRAY3=[100,100,100],GREEN=[0,200,110],SILVER=[180,180,180];
+
+  function setupPage(subtitle){
+    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
+    doc.setFillColor(...GRAY1);doc.rect(0,0,W,18,"F");
+    doc.setFillColor(...ORANGE);doc.rect(0,18,W,0.8,"F");
+    doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(...ORANGE);
+    doc.text(eventName.toUpperCase(),10,12);
+    doc.setFontSize(7);doc.setTextColor(...GRAY3);
+    doc.text(subtitle+"  |  "+dateStr,W-10,12,{align:"right"});
+  }
+
+  function drawTable(ranking,leaderMs,startY){
+    const stgCols=stages.map((s,i)=>({header:"S"+(i+1),dataKey:"s"+s.id}));
+    const cols=[{header:"#",dataKey:"pos"},{header:"Atleta",dataKey:"name"},{header:"Nº",dataKey:"num"},{header:"Cat.",dataKey:"cat"},...stgCols,{header:"Total",dataKey:"total"},{header:"Gap",dataKey:"gap"}];
+    const rows=ranking.map((a,i)=>{
+      const row={pos:["1°","2°","3°"][i]||(i+1)+"°",name:a.name,num:"#"+a.number,cat:a.category,total:a.total?fmt(a.total):"—",gap:i===0?"LIDER":(a.total&&leaderMs?"+"+fmt(a.total-leaderMs):"—")};
+      stages.forEach(s=>{const t=times.find(x=>Number(x.athlete_id)===Number(a.id)&&Number(x.stage_id)===Number(s.id));row["s"+s.id]=t?fmt(t.time_ms):"—"});
+      return row;
+    });
+    doc.autoTable({startY,columns:cols,body:rows,theme:"plain",
+      styles:{font:"helvetica",fontSize:8,textColor:SILVER,fillColor:DARK,cellPadding:{top:2.5,bottom:2.5,left:3,right:3},lineColor:GRAY2,lineWidth:0.1},
+      headStyles:{fillColor:GRAY1,textColor:ORANGE,fontStyle:"bold",fontSize:8,lineColor:GRAY2,lineWidth:0.3},
+      alternateRowStyles:{fillColor:[12,12,12]},
+      columnStyles:{pos:{cellWidth:10,halign:"center",fontStyle:"bold"},num:{cellWidth:12,halign:"center"},total:{cellWidth:26,halign:"right",textColor:GREEN,fontStyle:"bold"},gap:{cellWidth:24,halign:"right",textColor:GRAY3}},
+      didParseCell(d){
+        if(d.section==="body"&&d.row.index===0){d.cell.styles.textColor=ORANGE;d.cell.styles.fontStyle="bold"}
+        if(d.column.dataKey==="gap"&&d.cell.text[0]==="LIDER"){d.cell.styles.textColor=ORANGE;d.cell.styles.fontStyle="bold"}
+      },
+    });
+  }
+
+  const catNames=categories.length?categories.map(c=>c.name).filter(n=>athletes.some(a=>a.category===n)):[...new Set(athletes.map(a=>a.category).filter(Boolean))];
+
+  setupPage("RANKING GERAL");
+  doc.setFont("helvetica","bold");doc.setFontSize(12);doc.setTextColor(...WHITE);doc.text("RANKING GERAL",10,28);
+  doc.setFontSize(8);doc.setTextColor(...GRAY3);doc.text(athletes.length+" atletas · "+stages.length+" stages",10,34);
+  const rg=buildRanking("Todos");drawTable(rg,rg[0]?.total||0,38);
+
+  for(let i=0;i<catNames.length;i++){
+    const cat=catNames[i];
+    const r=buildRanking(cat);
+    if(!r||!r.length)continue;
+    doc.addPage();setupPage("CATEGORIA: "+cat.toUpperCase());
+    doc.setFont("helvetica","bold");doc.setFontSize(12);doc.setTextColor(...WHITE);doc.text(cat.toUpperCase(),10,28);
+    doc.setFontSize(8);doc.setTextColor(...GRAY3);doc.text(r.length+" atleta(s)",10,34);
+    drawTable(r,r[0]?.total||0,38);
+  }
+
+  const tp=doc.internal.getNumberOfPages();
+  for(let p=1;p<=tp;p++){
+    doc.setPage(p);doc.setFillColor(...GRAY1);doc.rect(0,H-8,W,8,"F");
+    doc.setFontSize(7);doc.setTextColor(...GRAY3);
+    doc.text("Enduro Timer — Cronometragem MTB",10,H-3);
+    doc.text("Pagina "+p+" de "+tp,W-10,H-3,{align:"right"});
+  }
+  doc.save(eventName.replace(/[^a-zA-Z0-9]/g,"-")+"-resultados.pdf");
+  toast("📄 PDF gerado com "+tp+" página(s)!",true);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const saved=sessionStorage.getItem("enduro_org");
+if(saved){try{currentOrg=JSON.parse(saved);showApp()}catch(e){}}
+document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/sw.js")
+    .then(()=>console.log("SW registrado"))
+    .catch(e=>console.log("SW falhou:", e));
+}
+</script>
+</body>
+</html>
