@@ -20,7 +20,6 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:#f5f4f0;color:#1a1a18;font-family:'Inter',sans-serif;min-height:100vh;padding-bottom:60px}
 
-/* ── LOGIN ── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#f5f4f0}
 .login-card{width:100%;max-width:380px}
 .login-logo{text-align:center;margin-bottom:32px}
@@ -30,9 +29,8 @@ body{background:#f5f4f0;color:#1a1a18;font-family:'Inter',sans-serif;min-height:
 .login-logo-sub{font-size:12px;color:#aaa;margin-top:6px;font-family:'DM Mono',monospace}
 .login-box{background:#fff;border:0.5px solid #e0dfd8;border-radius:16px;padding:28px 24px}
 .login-hint{text-align:center;margin-top:14px;font-size:11px;color:#ccc;font-family:'DM Mono',monospace}
-.login-err{font-size:12px;color:#E8593C;margin-bottom:12px;display:none;font-family:'DM Mono',monospace}
+.login-err{font-size:12px;color:#E8593C;margin-bottom:12px;display:none;font-family:'DM Mono',monospace;line-height:1.5}
 
-/* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:0.5px solid #e0dfd8;padding:13px 20px;display:flex;align-items:center;justify-content:space-between}
 .tb-label{font-size:10px;color:#bbb;letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace}
 .tb-title{font-family:'Inter',sans-serif;font-size:17px;font-weight:900;color:#1a1a18;letter-spacing:-.4px}
@@ -46,25 +44,20 @@ body{background:#f5f4f0;color:#1a1a18;font-family:'Inter',sans-serif;min-height:
 .tb-btn.accent{background:#E8593C18;border-color:#E8593C44;color:#E8593C}
 .tb-btn.red{background:#fff0f0;border-color:#ffcccc;color:#cc3333}
 
-/* ── STATS ── */
 .stats{display:flex;gap:10px;padding:18px 20px 0;overflow-x:auto}
 .stat{background:#fff;border:0.5px solid #e0dfd8;border-radius:12px;padding:14px 16px;flex:1;min-width:100px}
 .stat-lbl{font-size:10px;color:#bbb;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;font-family:'DM Mono',monospace}
 .stat-val{font-size:26px;font-weight:800;font-family:'Inter',sans-serif;letter-spacing:-.5px;line-height:1}
 .stat-sub{font-size:11px;color:#bbb;margin-top:3px;font-family:'DM Mono',monospace}
 
-/* ── TABS ── */
 .tabs{display:flex;padding:16px 20px 0;border-bottom:0.5px solid #e0dfd8;overflow-x:auto;background:#fff}
 .tab{padding:9px 16px;border:none;background:none;cursor:pointer;color:#bbb;font-weight:500;font-size:13px;border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap}
 .tab:hover{color:#555}
 .tab.on{color:#E8593C;font-weight:700;border-bottom-color:#E8593C}
-.tab.admin-tab{color:#E8593Caa}
-.tab.admin-tab.on{color:#E8593C;border-bottom-color:#E8593C}
 .content{padding:20px}
 .screen{display:none}
 .screen.on{display:block}
 
-/* ── FORMS ── */
 .fl{font-size:10px;color:#999;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:block;font-family:'DM Mono',monospace}
 .fi{width:100%;background:#f9f8f5;border:0.5px solid #d8d6ce;border-radius:8px;padding:10px 14px;color:#1a1a18;font-size:14px;outline:none;font-family:'DM Mono',monospace;margin-bottom:14px;transition:border-color .15s}
 .fi:focus{border-color:#E8593C;background:#fff}
@@ -75,13 +68,11 @@ select.fi option{background:#fff;color:#1a1a18}
 .btn-save.ok{background:#16a34a}
 .btn-save:disabled{background:#e0dfd8;color:#bbb;cursor:not-allowed}
 
-/* ── PILLS ── */
 .pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px}
 .pill{padding:5px 14px;border-radius:99px;border:0.5px solid #e0dfd8;background:#fff;color:#bbb;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace;white-space:nowrap}
 .pill:hover{border-color:#E8593C44;color:#555}
 .pill.on{border-color:#E8593C;background:#E8593C18;color:#E8593C;font-weight:600}
 
-/* ── RANKING ── */
 .rtable{background:#fff;border-radius:12px;border:0.5px solid #e0dfd8;overflow:hidden;overflow-x:auto}
 .rhead{display:grid;padding:10px 14px;border-bottom:0.5px solid #f0eed8;font-size:10px;color:#bbb;letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace}
 .rrow{display:grid;padding:12px 14px;border-bottom:0.5px solid #f5f4f0;align-items:center}
@@ -89,7 +80,6 @@ select.fi option{background:#fff;color:#1a1a18}
 .rrow:hover{background:#faf9f6}
 .rrow.gold{background:#fff8f0}
 
-/* ── CARDS ── */
 .list-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .count-lbl{font-size:12px;color:#bbb;font-family:'DM Mono',monospace}
 .btn-add{padding:8px 16px;border-radius:9px;border:0.5px solid #E8593C44;background:#E8593C12;color:#E8593C;font-weight:600;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
@@ -107,7 +97,6 @@ select.fi option{background:#fff;color:#1a1a18}
 .btn-del:hover{background:#ffe0e0}
 .admin-badge{display:inline-block;padding:2px 8px;border-radius:4px;background:#E8593C18;border:0.5px solid #E8593C44;color:#E8593C;font-size:10px;font-weight:600;margin-left:6px;font-family:'DM Mono',monospace}
 
-/* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:#00000044;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
 .overlay.open{display:flex}
 .modal{background:#fff;border:0.5px solid #e0dfd8;border-radius:18px;padding:26px 24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:mIn .2s ease}
@@ -118,12 +107,10 @@ select.fi option{background:#fff;color:#1a1a18}
 .modal-hint{font-size:12px;color:#bbb;margin-bottom:16px;font-family:'DM Mono',monospace}
 .modal-hint span{color:#E8593C}
 
-/* ── NOTIF ── */
 .notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a18;border:0.5px solid #333;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:500;color:#fff;z-index:200;transition:transform .3s ease;pointer-events:none;white-space:nowrap;font-family:'DM Mono',monospace}
 .notif.show{transform:translateX(-50%) translateY(0)}
 .notif.green{background:#f0fdf4;border-color:#16a34a44;color:#16a34a}
 
-/* ── CHECKLIST ── */
 .chk{margin-top:24px;padding:18px;background:#f9f8f5;border:0.5px solid #e0dfd8;border-radius:12px}
 .chk-title{font-size:10px;color:#bbb;margin-bottom:12px;letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace}
 .chk-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
@@ -148,14 +135,14 @@ button:active{opacity:.85}
       <div class="login-logo-sub">Painel do organizador</div>
     </div>
     <div class="login-box">
-      <label class="fl">Usuário</label>
-      <input class="fi" id="loginEmail" placeholder="ex: admin" autocapitalize="none">
+      <label class="fl">E-mail</label>
+      <input class="fi" id="loginEmail" placeholder="seu@email.com" type="email" autocapitalize="none">
       <label class="fl">Senha</label>
       <input class="fi" type="password" id="loginPass" placeholder="••••••••">
-      <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+      <div class="login-err" id="loginErr"></div>
       <button class="btn-save" onclick="doLogin()" id="btnLogin">Entrar</button>
     </div>
-    <div class="login-hint">Conta padrão: admin / 1234</div>
+    <div class="login-hint">Use o e-mail e senha cadastrados no Supabase Auth</div>
   </div>
 </div>
 
@@ -171,7 +158,6 @@ button:active{opacity:.85}
   <div class="tb-right">
     <div class="live-badge" id="liveBadge">○ ao vivo</div>
     <button class="tb-btn accent" onclick="gerarPDF()">PDF</button>
-    <button class="tb-btn" onclick="openChangePass()">🔑</button>
     <button class="tb-btn red" onclick="doLogout()">Sair</button>
   </div>
 </div>
@@ -217,8 +203,8 @@ button:active{opacity:.85}
       <div class="chk">
         <div class="chk-title">Próximos passos</div>
         <div class="chk-item"><span style="font-size:18px">📡</span><div><div style="font-size:13px;font-weight:600">Configurar detecção</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">QR codes ou beacons BLE na largada e chegada de cada stage</div></div></div>
-        <div class="chk-item"><span style="font-size:18px">📱</span><div><div style="font-size:13px;font-weight:600">Distribuir App aos Atletas</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Enviar link do app pelo WhatsApp com código do evento + PIN</div></div></div>
-        <div class="chk-item"><span style="font-size:18px">🏁</span><div><div style="font-size:13px;font-weight:600">Testar stage completo</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Largada → cronômetro → chegada → ranking atualiza ao vivo</div></div></div>
+        <div class="chk-item"><span style="font-size:18px">📱</span><div><div style="font-size:13px;font-weight:600">Distribuir App aos Atletas</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Enviar link do app com código do evento + PIN</div></div></div>
+        <div class="chk-item"><span style="font-size:18px">🏁</span><div><div style="font-size:13px;font-weight:600">Testar stage completo</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Largada → cronômetro → chegada → ranking ao vivo</div></div></div>
       </div>
     </div>
   </div>
@@ -227,8 +213,7 @@ button:active{opacity:.85}
     <div id="orgList"></div>
   </div>
 </div>
-
-</div><!-- /secApp -->
+</div>
 
 <!-- MODAIS -->
 <div class="overlay" id="mAth" onclick="closeM('mAth')">
@@ -273,19 +258,9 @@ button:active{opacity:.85}
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
     <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
-    <label class="fl">Usuário</label><input class="fi" id="oEmail" placeholder="Ex: carlos" autocapitalize="none">
-    <label class="fl">Senha inicial</label><input class="fi" id="oPass" placeholder="Ex: enduro2025">
-    <label class="fl">Código do Evento</label><input class="fi" id="oCode" placeholder="Ex: ENDURO25" style="text-transform:uppercase">
+    <label class="fl">E-mail</label><input class="fi" id="oEmail" placeholder="Ex: carlos@email.com" type="email" autocapitalize="none">
+    <label class="fl">Senha inicial</label><input class="fi" id="oPass" placeholder="mín. 6 caracteres" type="password">
     <button class="btn-save" onclick="addOrganizer()">Criar Organizador</button>
-  </div>
-</div>
-
-<div class="overlay" id="mChangePass" onclick="closeM('mChangePass')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><div class="modal-title">Alterar Senha</div><button class="modal-x" onclick="closeM('mChangePass')">✕</button></div>
-    <label class="fl">Nova senha</label><input class="fi" type="password" id="newPass1" placeholder="••••••••">
-    <label class="fl">Confirmar nova senha</label><input class="fi" type="password" id="newPass2" placeholder="••••••••">
-    <button class="btn-save" onclick="changePassword()">Salvar Nova Senha</button>
   </div>
 </div>
 
@@ -298,8 +273,8 @@ const sb = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocXV0c3B0eXh1cWRhYnRpb3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTY5MTQsImV4cCI6MjA5MjQzMjkxNH0.fYM3z8G0HL6Zer7qj8HjqGIncZ4YRjCT7VSmzmFrvLA'
 );
 
-let currentOrg=null,athletes=[],stages=[],times=[],categories=[],organizers=[];
-let currentCat="Todos",editingAthId=null;
+let currentOrg=null, athletes=[], stages=[], times=[], categories=[];
+let currentCat="Todos", editingAthId=null;
 
 function fmt(ms){if(!ms)return"--:--.---";const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),r=ms%1000;return`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${String(r).padStart(3,"0")}`}
 function fmtS(ms){if(!ms)return"—";return`${String(Math.floor(ms/60000)).padStart(2,"0")}:${String(Math.floor((ms%60000)/1000)).padStart(2,"0")}`}
@@ -318,80 +293,96 @@ function toast(msg,green=false){
 function openM(id){document.getElementById(id).classList.add("open")}
 function closeM(id){document.getElementById(id).classList.remove("open")}
 
+// ── AUTH (Supabase Auth) ──────────────────────────────────────────────────────
 async function doLogin(){
-  const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const email=document.getElementById("loginEmail").value.trim();
   const pass=document.getElementById("loginPass").value.trim();
+  const err=document.getElementById("loginErr");
+  err.style.display="none";
   if(!email||!pass)return;
   const btn=document.getElementById("btnLogin");
-  btn.disabled=true;btn.textContent="Verificando...";
-  const{data,error}=await sb.from("organizers").select("*").eq("username",email).eq("password",pass).single();
-  if(error||!data){
-    document.getElementById("loginErr").style.display="block";
-    btn.disabled=false;btn.textContent="Entrar";return;
+  btn.disabled=true;btn.textContent="Entrando...";
+
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){
+    err.textContent=error.message==="Invalid login credentials"?"E-mail ou senha incorretos.":error.message;
+    err.style.display="block";
+    btn.disabled=false;btn.textContent="Entrar";
+    return;
   }
-  currentOrg=data;sessionStorage.setItem("enduro_org",JSON.stringify(data));showApp();
+
+  // Busca dados do organizador na tabela
+  const{data:org,error:orgErr}=await sb.from("organizers").select("*").eq("id",data.user.id).single();
+  if(orgErr||!org){
+    err.textContent="Usuário autenticado mas não encontrado como organizador. Contate o admin.";
+    err.style.display="block";
+    await sb.auth.signOut();
+    btn.disabled=false;btn.textContent="Entrar";
+    return;
+  }
+  currentOrg=org;
+  showApp();
 }
 
-function showApp(){
-  document.getElementById("secLogin").style.display="none";
-  document.getElementById("secApp").style.display="block";
-  const codeStr=currentOrg.event_code?` · ${currentOrg.event_code}`:"";
-  document.getElementById("tbOrg").textContent=currentOrg.name+(currentOrg.is_admin?" · Admin":codeStr);
-  if(currentOrg.is_admin){
-    document.getElementById("tabsBar").style.display="none";
-    document.querySelector(".stats").style.display="none";
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
-    document.getElementById("sc-admin").classList.add("on");
-    loadOrganizers();
-  } else {loadAll()}
-}
-
-function doLogout(){
-  sessionStorage.removeItem("enduro_org");currentOrg=null;
-  athletes=[];stages=[];times=[];categories=[];organizers=[];
+async function doLogout(){
+  await sb.auth.signOut();
+  currentOrg=null;athletes=[];stages=[];times=[];categories=[];
   document.getElementById("tabsBar").style.display="flex";
   document.querySelector(".stats").style.display="flex";
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
   document.getElementById("sc-ranking").classList.add("on");
   document.querySelector(".tab").classList.add("on");
-  document.querySelectorAll(".admin-tab").forEach(t=>t.remove());
   document.getElementById("secApp").style.display="none";
   document.getElementById("secLogin").style.display="flex";
   document.getElementById("loginEmail").value="";
   document.getElementById("loginPass").value="";
   document.getElementById("loginErr").style.display="none";
+  document.getElementById("btnLogin").disabled=false;
+  document.getElementById("btnLogin").textContent="Entrar";
 }
 
-function openChangePass(){openM("mChangePass")}
-async function changePassword(){
-  const p1=document.getElementById("newPass1").value.trim();
-  const p2=document.getElementById("newPass2").value.trim();
-  if(!p1||p1.length<4){toast("Senha muito curta (mín. 4 caracteres)");return}
-  if(p1!==p2){toast("Senhas não coincidem");return}
-  const{error}=await sb.from("organizers").update({password:p1}).eq("id",currentOrg.id);
-  if(!error){currentOrg.password=p1;sessionStorage.setItem("enduro_org",JSON.stringify(currentOrg));closeM("mChangePass");toast("✓ Senha alterada",true)}
-  else toast("Erro ao alterar senha");
+function showApp(){
+  document.getElementById("secLogin").style.display="none";
+  document.getElementById("secApp").style.display="block";
+  const isAdmin=currentOrg.role==="admin";
+  document.getElementById("tbOrg").textContent=currentOrg.name+(isAdmin?" · Admin":"");
+
+  if(isAdmin){
+    // Adiciona aba admin se não existir
+    if(!document.getElementById("tab-admin")){
+      const t=document.createElement("button");
+      t.className="tab";t.id="tab-admin";
+      t.textContent="👑 Admin";
+      t.onclick=function(){switchTab("admin",this)};
+      document.getElementById("tabsBar").appendChild(t);
+    }
+  }
+  loadAll();
 }
 
+// ── DADOS ─────────────────────────────────────────────────────────────────────
 async function loadAll(){
-  const orgFilter=currentOrg.is_admin?null:currentOrg.id;
-  let qA=sb.from("athletes").select("*").order("number");
-  let qS=sb.from("stages").select("*").order("id");
-  let qT=sb.from("times").select("*");
-  let qC=sb.from("categories").select("*").order("name");
-  if(orgFilter){qA=qA.eq("organizer_id",orgFilter);qS=qS.eq("organizer_id",orgFilter);qT=qT.eq("organizer_id",orgFilter);qC=qC.eq("organizer_id",orgFilter)}
-  const[{data:a},{data:s},{data:t},{data:c}]=await Promise.all([qA,qS,qT,qC]);
+  const isAdmin=currentOrg.role==="admin";
+  const oid=currentOrg.id;
+
+  // Admin vê tudo via RLS (policies já filtram por organizer_id via auth.uid())
+  // Organizador comum vê só os seus (RLS cuida disso automaticamente)
+  const[{data:a},{data:s},{data:t},{data:c}]=await Promise.all([
+    sb.from("athletes").select("*").order("bib_number"),
+    sb.from("stages").select("*").order("display_order"),
+    sb.from("times").select("*"),
+    sb.from("categories").select("*").order("name"),
+  ]);
   athletes=a||[];stages=s||[];times=t||[];categories=c||[];
-  if(currentOrg.is_admin){const{data:o}=await sb.from("organizers").select("*").order("name");organizers=o||[]}
-  renderAll();subscribeRealtime();
+  renderAll();
+  subscribeRealtime();
 }
 
 function subscribeRealtime(){
   sb.channel("painel-"+currentOrg.id)
     .on("postgres_changes",{event:"*",schema:"public",table:"times"},p=>{
       if(p.eventType==="INSERT"){
-        if(!currentOrg.is_admin&&p.new.organizer_id!==currentOrg.id)return;
         times=times.filter(t=>!(t.athlete_id===p.new.athlete_id&&t.stage_id===p.new.stage_id));
         times.push(p.new);flashLive();renderAll();
         const ath=athletes.find(a=>a.id===p.new.athlete_id);
@@ -408,7 +399,8 @@ function flashLive(){
   setTimeout(()=>{b.classList.remove("flash");b.textContent="○ ao vivo"},2000);
 }
 
-function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories();if(currentOrg?.is_admin)renderOrganizers()}
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories()}
 
 function renderStats(){
   document.getElementById("stA").textContent=athletes.length;
@@ -419,7 +411,7 @@ function renderStats(){
 }
 
 function renderRanking(){
-  const cats=["Todos",...(categories.length?categories.map(c=>c.name):[...new Set(athletes.map(a=>a.category).filter(Boolean))]).filter(c=>athletes.some(a=>a.category===c))];
+  const cats=["Todos",...categories.map(c=>c.name).filter(n=>athletes.some(a=>a.category===n))];
   document.getElementById("catPills").innerHTML=cats.map(c=>`<button class="pill${c===currentCat?" on":""}" onclick="setCat('${c}')">${c}</button>`).join("");
   const rank=buildRanking(currentCat);
   const leader=rank[0]?.total||0;
@@ -429,98 +421,89 @@ function renderRanking(){
   const rows=rank.map((a,i)=>{
     const gap=a.total&&leader?a.total-leader:null;
     const stgCols=stages.map(s=>{
-      const t=times.find(x=>Number(x.athlete_id)===Number(a.id)&&Number(x.stage_id)===Number(s.id));
+      const t=times.find(x=>x.athlete_id===a.id&&x.stage_id===s.id);
       return`<span style="font-size:12px;font-family:'DM Mono',monospace;text-align:right;color:${t?"#555":"#ccc"}">${t?fmtS(t.time_ms):"—"}</span>`;
     }).join("");
     return`<div class="rrow${i===0?" gold":""}" style="grid-template-columns:${cols}">
       <span style="font-size:13px;font-weight:700;color:${i<3?"#E8593C":"#ccc"}">${medals[i]||i+1}</span>
-      <div><div style="font-size:14px;font-weight:600;color:#1a1a18">${a.name}</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace">#${a.number} · ${a.done}/${stages.length}</div></div>
-      <span style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace">${a.category}</span>
+      <div><div style="font-size:14px;font-weight:600;color:#1a1a18">${a.name}</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace">#${a.bib_number} · ${a.done}/${stages.length}</div></div>
+      <span style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace">${a.category||"—"}</span>
       ${stgCols}
       <div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:${i===0?"#E8593C":"#1a1a18"}">${a.total?fmt(a.total):"—"}</div>${gap>0?`<div style="font-size:10px;color:#bbb;font-family:'DM Mono',monospace">+${fmtS(gap)}</div>`:""}</div>
     </div>`;
   }).join("");
-  document.getElementById("rankTable").innerHTML=head+rows;
+  document.getElementById("rankTable").innerHTML=head+(rows||`<div style="padding:32px;text-align:center;color:#bbb;font-family:'DM Mono',monospace;font-size:13px">Nenhum atleta ainda.</div>`);
 }
 function setCat(c){currentCat=c;renderRanking()}
 
 function renderAthletes(){
   document.getElementById("athCount").textContent=`${athletes.length} atletas inscritos`;
-  document.getElementById("athList").innerHTML=athletes.map(a=>`
+  document.getElementById("athList").innerHTML=athletes.length?athletes.map(a=>`
     <div class="card">
-      <div class="card-l"><div class="badge">#${a.number}</div>
+      <div class="card-l"><div class="badge">#${a.bib_number}</div>
         <div><div class="card-name">${a.name}</div>
-        <div class="card-meta">${a.category} · ${doneCount(a)}/${stages.length} stages · PIN: ${a.pin||"—"}</div></div>
+        <div class="card-meta">${a.category||"—"} · ${doneCount(a)}/${stages.length} stages · PIN: ${a.pin_hash?.startsWith("__pin__")?a.pin_hash.replace("__pin__",""):"••••"}</div></div>
       </div>
       <div class="card-r">
-        <button class="btn-sm" onclick="openEditTimes(${a.id})">⏱ Tempos</button>
-        <button class="btn-sm btn-del" onclick="removeAthlete(${a.id})">✕</button>
+        <button class="btn-sm" onclick="openEditTimes('${a.id}')">⏱ Tempos</button>
+        <button class="btn-sm btn-del" onclick="removeAthlete('${a.id}')">✕</button>
       </div>
-    </div>`).join("");
+    </div>`).join(""):`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhum atleta cadastrado.</div>`;
   const sel=document.getElementById("nCat");
-  if(sel)sel.innerHTML=categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join("")||`<option>Sem categorias</option>`;
+  if(sel)sel.innerHTML=categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join("")||`<option value="">Sem categorias</option>`;
 }
 
 function renderStages(){
   document.getElementById("stgCount").textContent=`${stages.length} stages`;
-  document.getElementById("stgList").innerHTML=stages.map((s,i)=>`
+  document.getElementById("stgList").innerHTML=stages.length?stages.map((s,i)=>`
     <div class="card">
       <div class="card-l"><div class="badge">S${i+1}</div>
-        <div><div class="card-name">${s.name}</div><div class="card-meta">${[s.distance,s.drop_meters?s.drop_meters+" desnível":""].filter(Boolean).join(" · ")||"sem detalhes"}</div></div>
+        <div><div class="card-name">${s.name}</div><div class="card-meta">${[s.distance_m?s.distance_m+"m":null,s.description].filter(Boolean).join(" · ")||"sem detalhes"}</div></div>
       </div>
       <div class="card-r">
-        <span style="padding:4px 10px;border-radius:6px;background:#f5f4f0;border:0.5px solid #e0dfd8;font-size:10px;color:#bbb;font-family:'DM Mono',monospace">S${i+1}-START/FINISH</span>
-        <button class="btn-sm btn-del" onclick="removeStage(${s.id})">✕</button>
+        <span style="padding:4px 10px;border-radius:6px;background:#f5f4f0;border:0.5px solid #e0dfd8;font-size:10px;color:#bbb;font-family:'DM Mono',monospace">S${i+1}</span>
+        <button class="btn-sm btn-del" onclick="removeStage('${s.id}')">✕</button>
       </div>
-    </div>`).join("");
+    </div>`).join(""):`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhum stage cadastrado.</div>`;
 }
 
 function renderCategories(){
   const el=document.getElementById("catList");if(!el)return;
   document.getElementById("catCount").textContent=`${categories.length} categorias`;
-  if(!categories.length){el.innerHTML=`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhuma categoria cadastrada.</div>`;return}
-  el.innerHTML=categories.map(c=>`
+  el.innerHTML=categories.length?categories.map(c=>`
     <div class="card">
       <div class="card-l"><div class="badge">🏷</div>
         <div><div class="card-name">${c.name}</div><div class="card-meta">${athletes.filter(a=>a.category===c.name).length} atleta(s)</div></div>
       </div>
-      <div class="card-r"><button class="btn-sm btn-del" onclick="removeCategory(${c.id},'${c.name}')">✕</button></div>
-    </div>`).join("");
+      <div class="card-r"><button class="btn-sm btn-del" onclick="removeCategory('${c.id}','${c.name}')">✕</button></div>
+    </div>`).join(""):`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhuma categoria cadastrada.</div>`;
 }
 
-function renderOrganizers(){
-  const el=document.getElementById("orgList");if(!el)return;
-  const count=organizers.filter(o=>!o.is_admin).length;
-  document.getElementById("orgCount").textContent=`${count} organizador(es)`;
-  el.innerHTML=organizers.map(o=>`
-    <div class="card" style="${o.is_admin?"border-color:#E8593C33;background:#fff7f5":""}">
-      <div class="card-l">
-        <div class="badge" style="${o.is_admin?"background:#E8593C18":""}">${o.is_admin?"👑":"👤"}</div>
-        <div>
-          <div class="card-name">${o.name}${o.is_admin?'<span class="admin-badge">ADMIN</span>':""}</div>
-          <div class="card-meta">@${o.username}</div>
-          ${!o.is_admin&&o.event_code?`<div style="margin-top:4px"><span style="padding:2px 8px;border-radius:5px;background:#E8593C12;border:0.5px solid #E8593C33;font-size:10px;font-family:'DM Mono',monospace;color:#E8593C;font-weight:600">🎯 ${o.event_code}</span></div>`:""}
-        </div>
-      </div>
-      ${!o.is_admin?`<div class="card-r">
-        <button class="btn-sm" onclick="resetPassword(${o.id},'${o.name}')">🔑</button>
-        <button class="btn-sm btn-del" onclick="removeOrganizer(${o.id})">✕</button>
-      </div>`:""}
-    </div>`).join("");
-}
-
+// ── ATLETAS ───────────────────────────────────────────────────────────────────
 async function addAthlete(){
   const name=document.getElementById("nName").value.trim();
-  const number=document.getElementById("nNum").value.trim();
+  const bib=parseInt(document.getElementById("nNum").value.trim());
   const pin=document.getElementById("nPin").value.trim();
   const category=document.getElementById("nCat").value;
-  if(!name||!number||!pin){toast("Preencha todos os campos");return}
-  const dup=athletes.find(a=>a.number===number);
-  if(dup){toast(`⚠️ Número ${number} já está em uso por ${dup.name}`);return}
-  const{error}=await sb.from("athletes").insert({name,number,category,pin,organizer_id:currentOrg.id});
+  if(!name||!bib||!pin){toast("Preencha todos os campos");return}
+  if(athletes.find(a=>a.bib_number===bib)){toast(`⚠️ Número #${bib} já em uso`);return}
+
+  // Busca category_id
+  const cat=categories.find(c=>c.name===category);
+  if(!cat){toast("Selecione uma categoria válida");return}
+
+  const{error}=await sb.from("athletes").insert({
+    event_id: currentOrg.id, // temporário até ter events table integrada
+    category_id: cat.id,
+    bib_number: bib,
+    name,
+    pin_hash: `__pin__${pin}`, // armazenamento simples temporário
+    category // campo legado para ranking
+  });
   if(!error){closeM("mAth");toast("✓ Atleta cadastrado",true);await loadAll()}
   else toast("Erro ao cadastrar atleta");
 }
+
 async function removeAthlete(id){
   if(!confirm("Remover atleta?"))return;
   await sb.from("times").delete().eq("athlete_id",id);
@@ -528,30 +511,55 @@ async function removeAthlete(id){
   athletes=athletes.filter(a=>a.id!==id);times=times.filter(t=>t.athlete_id!==id);
   renderAll();toast("Atleta removido");
 }
+
 function openEditTimes(id){
   const a=athletes.find(x=>x.id===id);editingAthId=id;
   document.getElementById("mTimesTitle").textContent=`Tempos — ${a.name}`;
   document.getElementById("timesInputs").innerHTML=stages.map(s=>{
     const t=times.find(x=>x.athlete_id===id&&x.stage_id===s.id);
-    return`<label class="fl">Stage ${stages.findIndex(x=>x.id===s.id)+1} — ${s.name}</label><input class="fi" id="ti_${s.id}" value="${t?fmt(t.time_ms):""}" placeholder="mm:ss.mmm ou vazio">`;
+    const idx=stages.findIndex(x=>x.id===s.id)+1;
+    return`<label class="fl">Stage ${idx} — ${s.name}</label><input class="fi" id="ti_${s.id}" value="${t?fmt(t.duration_ms||t.time_ms):""}" placeholder="mm:ss.mmm ou vazio">`;
   }).join("");
   openM("mTimes");
 }
+
 async function saveTimes(){
   for(const s of stages){
     const val=document.getElementById(`ti_${s.id}`)?.value;
     const ms=parseFmt(val);
     const existing=times.find(t=>t.athlete_id===editingAthId&&t.stage_id===s.id);
-    if(ms&&!existing){const{data}=await sb.from("times").insert({athlete_id:editingAthId,stage_id:s.id,time_ms:ms,organizer_id:currentOrg.id}).select().single();if(data)times.push(data)}
-    else if(ms&&existing){await sb.from("times").update({time_ms:ms}).eq("id",existing.id);existing.time_ms=ms}
-    else if(!ms&&existing){await sb.from("times").delete().eq("id",existing.id);times=times.filter(t=>t.id!==existing.id)}
+    if(ms&&!existing){
+      const{data}=await sb.from("times").insert({
+        event_id: currentOrg.id,
+        athlete_id: editingAthId,
+        stage_id: s.id,
+        type: "finish",
+        recorded_at: new Date().toISOString(),
+        duration_ms: ms,
+        source: "manual"
+      }).select().single();
+      if(data)times.push({...data,time_ms:ms});
+    } else if(ms&&existing){
+      await sb.from("times").update({duration_ms:ms}).eq("id",existing.id);
+      existing.duration_ms=ms;existing.time_ms=ms;
+    } else if(!ms&&existing){
+      await sb.from("times").delete().eq("id",existing.id);
+      times=times.filter(t=>t.id!==existing.id);
+    }
   }
   closeM("mTimes");renderAll();toast("✓ Tempos salvos",true);
 }
 
+// ── STAGES ────────────────────────────────────────────────────────────────────
 async function addStage(){
   const name=document.getElementById("sName").value.trim();if(!name)return;
-  const{error}=await sb.from("stages").insert({name,distance:document.getElementById("sDist").value,drop_meters:document.getElementById("sDrop").value,organizer_id:currentOrg.id});
+  const{error}=await sb.from("stages").insert({
+    event_id: currentOrg.id,
+    name,
+    distance_m: parseInt(document.getElementById("sDist").value)||null,
+    description: document.getElementById("sDrop").value||null,
+    display_order: stages.length
+  });
   if(!error){closeM("mStg");toast("✓ Stage adicionado",true);await loadAll()}else toast("Erro ao adicionar stage");
 }
 async function removeStage(id){
@@ -560,49 +568,34 @@ async function removeStage(id){
   stages=stages.filter(s=>s.id!==id);times=times.filter(t=>t.stage_id!==id);renderAll();toast("Stage removido");
 }
 
+// ── CATEGORIAS ────────────────────────────────────────────────────────────────
 async function addCategory(){
   const name=document.getElementById("cName").value.trim();if(!name)return;
-  const{error}=await sb.from("categories").insert({name,organizer_id:currentOrg.id});
+  const{error}=await sb.from("categories").insert({event_id: currentOrg.id, name});
   if(!error){closeM("mCat");document.getElementById("cName").value="";toast("✓ Categoria adicionada",true);await loadAll()}else toast("Erro ao adicionar categoria");
 }
 async function removeCategory(id,name){
-  if(athletes.some(a=>a.category===name)){toast(`⚠️ Categoria em uso por ${athletes.filter(a=>a.category===name).length} atleta(s)`);return}
+  if(athletes.some(a=>a.category===name)){toast(`⚠️ Categoria em uso`);return}
   if(!confirm(`Remover "${name}"?`))return;
   await sb.from("categories").delete().eq("id",id);
   categories=categories.filter(c=>c.id!==id);renderAll();toast("Categoria removida");
 }
 
-async function loadOrganizers(){
-  const{data}=await sb.from("organizers").select("*").order("name");
-  organizers=data||[];renderOrganizers();
-}
+// ── ORGANIZADORES (admin) ─────────────────────────────────────────────────────
 async function addOrganizer(){
   const name=document.getElementById("oName").value.trim();
-  const email=document.getElementById("oEmail").value.trim().toLowerCase().replace(/\s+/g,"_");
-  const password=document.getElementById("oPass").value.trim();
-  const code=document.getElementById("oCode").value.trim().toUpperCase();
-  if(!name||!email||!password||!code){toast("Preencha todos os campos");return}
-  const{data:dup}=await sb.from("organizers").select("id,username,event_code");
-  if(dup&&dup.some(o=>o.username===email)){toast("⚠️ Usuário já cadastrado");return}
-  if(dup&&dup.some(o=>o.event_code===code)){toast("⚠️ Código de evento já em uso");return}
-  const{error}=await sb.from("organizers").insert({name,username:email,password,is_admin:false,event_code:code});
-  if(!error){closeM("mOrg");["oName","oEmail","oPass","oCode"].forEach(id=>document.getElementById(id).value="");toast("✓ Organizador criado",true);await loadOrganizers()}
-  else toast("Erro ao criar organizador");
-}
-async function removeOrganizer(id){
-  if(!confirm("Remover organizador?"))return;
-  await sb.from("organizers").delete().eq("id",id);
-  organizers=organizers.filter(o=>o.id!==id);renderOrganizers();toast("Organizador removido");
-}
-async function resetPassword(id,name){
-  const nova=prompt(`Nova senha para ${name}:`);
-  if(!nova||nova.length<4){toast("Senha muito curta");return}
-  const{error}=await sb.from("organizers").update({password:nova}).eq("id",id);
-  if(!error)toast(`✓ Senha de ${name} atualizada`,true);else toast("Erro ao resetar senha");
+  const email=document.getElementById("oEmail").value.trim().toLowerCase();
+  const pass=document.getElementById("oPass").value.trim();
+  if(!name||!email||!pass){toast("Preencha todos os campos");return}
+  if(pass.length<6){toast("Senha mín. 6 caracteres");return}
+
+  // Cria usuário no Supabase Auth via Admin API — não disponível no client
+  // Por enquanto orienta o admin a criar manualmente
+  toast("Crie o usuário no Supabase Auth → Users → Add user, depois insira na tabela organizers.");
 }
 
+// ── EVENTO ────────────────────────────────────────────────────────────────────
 function saveEvent(){
-  document.getElementById("evtTitle")&&(document.getElementById("evtTitle").textContent=document.getElementById("evName").value||"EnduroTimer");
   const btn=document.getElementById("btnSave");btn.textContent="✓ Salvo";btn.classList.add("ok");
   setTimeout(()=>{btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
 }
@@ -613,10 +606,10 @@ function switchTab(id,el){
   document.getElementById("sc-"+id).classList.add("on");el.classList.add("on");
 }
 
+// ── PDF ───────────────────────────────────────────────────────────────────────
 function gerarPDF(){
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-  const eventName="Enduro Timer";
   const dateStr=new Date().toLocaleDateString("pt-BR");
   const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
   const BG=[245,244,240],WHITE=[255,255,255],DARK=[26,26,24],ACCENT=[232,89,60],GRAY=[170,168,160],LGRAY=[224,223,216],GREEN=[22,163,74];
@@ -625,19 +618,17 @@ function gerarPDF(){
     doc.setFillColor(...BG);doc.rect(0,0,W,H,"F");
     doc.setFillColor(...WHITE);doc.rect(0,0,W,18,"F");
     doc.setFillColor(...LGRAY);doc.rect(0,18,W,0.5,"F");
-    doc.setFont("helvetica","bold");doc.setFontSize(13);doc.setTextColor(...DARK);
-    doc.text("Enduro",10,12);
+    doc.setFont("helvetica","bold");doc.setFontSize(13);doc.setTextColor(...DARK);doc.text("Enduro",10,12);
     doc.setTextColor(...ACCENT);doc.text("Timer",10+doc.getTextWidth("Enduro"),12);
-    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...GRAY);
-    doc.text(subtitle+" · "+dateStr,W-10,12,{align:"right"});
+    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(...GRAY);doc.text(subtitle+" · "+dateStr,W-10,12,{align:"right"});
   }
 
   function drawTable(ranking,leaderMs,startY){
     const stgCols=stages.map((s,i)=>({header:"S"+(i+1),dataKey:"s"+s.id}));
     const cols=[{header:"#",dataKey:"pos"},{header:"Atleta",dataKey:"name"},{header:"Nº",dataKey:"num"},{header:"Cat.",dataKey:"cat"},...stgCols,{header:"Total",dataKey:"total"},{header:"Gap",dataKey:"gap"}];
     const rows=ranking.map((a,i)=>{
-      const row={pos:["1°","2°","3°"][i]||(i+1)+"°",name:a.name,num:"#"+a.number,cat:a.category,total:a.total?fmt(a.total):"—",gap:i===0?"LIDER":(a.total&&leaderMs?"+"+fmt(a.total-leaderMs):"—")};
-      stages.forEach(s=>{const t=times.find(x=>Number(x.athlete_id)===Number(a.id)&&Number(x.stage_id)===Number(s.id));row["s"+s.id]=t?fmt(t.time_ms):"—"});
+      const row={pos:["1°","2°","3°"][i]||(i+1)+"°",name:a.name,num:"#"+a.bib_number,cat:a.category||"—",total:a.total?fmt(a.total):"—",gap:i===0?"LIDER":(a.total&&leaderMs?"+"+fmt(a.total-leaderMs):"—")};
+      stages.forEach(s=>{const t=times.find(x=>x.athlete_id===a.id&&x.stage_id===s.id);row["s"+s.id]=t?fmt(t.duration_ms||t.time_ms):"—"});
       return row;
     });
     doc.autoTable({startY,columns:cols,body:rows,theme:"plain",
@@ -645,22 +636,17 @@ function gerarPDF(){
       headStyles:{fillColor:BG,textColor:GRAY,fontStyle:"bold",fontSize:8,lineColor:LGRAY,lineWidth:0.3},
       alternateRowStyles:{fillColor:[250,249,246]},
       columnStyles:{pos:{cellWidth:10,halign:"center",fontStyle:"bold"},num:{cellWidth:12,halign:"center"},total:{cellWidth:26,halign:"right",textColor:GREEN,fontStyle:"bold"},gap:{cellWidth:24,halign:"right",textColor:GRAY}},
-      didParseCell(d){
-        if(d.section==="body"&&d.row.index===0){d.cell.styles.textColor=ACCENT;d.cell.styles.fontStyle="bold"}
-        if(d.column.dataKey==="gap"&&d.cell.text[0]==="LIDER"){d.cell.styles.textColor=ACCENT;d.cell.styles.fontStyle="bold"}
-      },
+      didParseCell(d){if(d.section==="body"&&d.row.index===0){d.cell.styles.textColor=ACCENT;d.cell.styles.fontStyle="bold"}if(d.column.dataKey==="gap"&&d.cell.text[0]==="LIDER"){d.cell.styles.textColor=ACCENT;d.cell.styles.fontStyle="bold"}},
     });
   }
-
-  const catNames=categories.length?categories.map(c=>c.name).filter(n=>athletes.some(a=>a.category===n)):[...new Set(athletes.map(a=>a.category).filter(Boolean))];
 
   setupPage("Ranking Geral");
   doc.setFont("helvetica","bold");doc.setFontSize(12);doc.setTextColor(...DARK);doc.text("RANKING GERAL",10,28);
   doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(...GRAY);doc.text(athletes.length+" atletas · "+stages.length+" stages",10,34);
   const rg=buildRanking("Todos");drawTable(rg,rg[0]?.total||0,38);
 
-  for(const cat of catNames){
-    const r=buildRanking(cat);if(!r||!r.length)continue;
+  for(const cat of categories.map(c=>c.name)){
+    const r=buildRanking(cat);if(!r?.length)continue;
     doc.addPage();setupPage("Categoria: "+cat);
     doc.setFont("helvetica","bold");doc.setFontSize(12);doc.setTextColor(...DARK);doc.text(cat.toUpperCase(),10,28);
     doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(...GRAY);doc.text(r.length+" atleta(s)",10,34);
@@ -671,15 +657,21 @@ function gerarPDF(){
   for(let p=1;p<=tp;p++){
     doc.setPage(p);doc.setFillColor(...BG);doc.rect(0,H-8,W,8,"F");
     doc.setFontSize(7);doc.setTextColor(...GRAY);
-    doc.text("Enduro Timer — Cronometragem MTB",10,H-3);
-    doc.text("Página "+p+" de "+tp,W-10,H-3,{align:"right"});
+    doc.text("Enduro Timer — Cronometragem MTB",10,H-3);doc.text("Página "+p+" de "+tp,W-10,H-3,{align:"right"});
   }
-  doc.save(eventName.replace(/[^a-zA-Z0-9]/g,"-")+"-resultados.pdf");
-  toast("✓ PDF gerado com "+tp+" página(s)",true);
+  doc.save("enduro-timer-resultados.pdf");toast("✓ PDF gerado",true);
 }
 
-const saved=sessionStorage.getItem("enduro_org");
-if(saved){try{currentOrg=JSON.parse(saved);showApp()}catch(e){}}
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Verifica sessão existente
+sb.auth.getSession().then(({data:{session}})=>{
+  if(session){
+    sb.from("organizers").select("*").eq("id",session.user.id).single().then(({data:org})=>{
+      if(org){currentOrg=org;showApp()}
+    });
+  }
+});
+
 document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
 document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
 if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
