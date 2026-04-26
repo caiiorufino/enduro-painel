@@ -311,13 +311,23 @@ async function doLogin(){
     return;
   }
 
-  // Busca dados do organizador na tabela
+  // Aguarda sessão ser propagada antes de buscar organizers
+  await new Promise(r=>setTimeout(r,500));
+
   const{data:org,error:orgErr}=await sb.from("organizers").select("*").eq("id",data.user.id).single();
   if(orgErr||!org){
-    err.textContent="Usuário autenticado mas não encontrado como organizador. Contate o admin.";
-    err.style.display="block";
-    await sb.auth.signOut();
-    btn.disabled=false;btn.textContent="Entrar";
+    // Tenta mais uma vez após 1s
+    await new Promise(r=>setTimeout(r,1000));
+    const{data:org2,error:orgErr2}=await sb.from("organizers").select("*").eq("id",data.user.id).single();
+    if(orgErr2||!org2){
+      err.textContent=`Auth OK mas organizador não encontrado (id: ${data.user.id}). Erro: ${orgErr2?.message||orgErr?.message}`;
+      err.style.display="block";
+      await sb.auth.signOut();
+      btn.disabled=false;btn.textContent="Entrar";
+      return;
+    }
+    currentOrg=org2;
+    showApp();
     return;
   }
   currentOrg=org;
