@@ -305,36 +305,30 @@ async function doLogin(){
 
   const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){
-    err.textContent=error.message==="Invalid login credentials"?"E-mail ou senha incorretos.":error.message;
+    err.textContent="E-mail ou senha incorretos.";
     err.style.display="block";
     btn.disabled=false;btn.textContent="Entrar";
     return;
   }
 
-  // Aguarda sessão ser propagada antes de buscar organizers
-  await new Promise(r=>setTimeout(r,500));
+  await sb.auth.setSession({
+    access_token: data.session.access_token,
+    refresh_token: data.session.refresh_token
+  });
 
-  const{data:org,error:orgErr}=await sb.from("organizers").select("*").eq("id",data.user.id).single();
+  const uid = data.user.id;
+  const{data:org,error:orgErr}=await sb.from("organizers").select("*").eq("id",uid).single();
+  
   if(orgErr||!org){
-    // Tenta mais uma vez após 1s
-    await new Promise(r=>setTimeout(r,1000));
-    const{data:org2,error:orgErr2}=await sb.from("organizers").select("*").eq("id",data.user.id).single();
-    if(orgErr2||!org2){
-      err.textContent=`Auth OK mas organizador não encontrado (id: ${data.user.id}). Erro: ${orgErr2?.message||orgErr?.message}`;
-      err.style.display="block";
-      await sb.auth.signOut();
-      btn.disabled=false;btn.textContent="Entrar";
-      return;
-    }
-    currentOrg=org2;
-    showApp();
+    err.textContent=`Erro: ${orgErr?.message||"não encontrado"} (uid: ${uid})`;
+    err.style.display="block";
+    await sb.auth.signOut();
+    btn.disabled=false;btn.textContent="Entrar";
     return;
   }
   currentOrg=org;
   showApp();
 }
-
-async function doLogout(){
   await sb.auth.signOut();
   currentOrg=null;athletes=[];stages=[];times=[];categories=[];
   document.getElementById("tabsBar").style.display="flex";
