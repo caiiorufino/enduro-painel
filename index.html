@@ -135,14 +135,14 @@ button:active{opacity:.85}
       <div class="login-logo-sub">Painel do organizador</div>
     </div>
     <div class="login-box">
-      <label class="fl">E-mail</label>
-      <input class="fi" id="loginEmail" placeholder="seu@email.com" type="email" autocapitalize="none">
+      <label class="fl">Username</label>
+      <input class="fi" id="loginUsername" placeholder="seu_username" autocapitalize="none">
       <label class="fl">Senha</label>
       <input class="fi" type="password" id="loginPass" placeholder="••••••••">
       <div class="login-err" id="loginErr"></div>
       <button class="btn-save" onclick="doLogin()" id="btnLogin">Entrar</button>
     </div>
-    <div class="login-hint">Use o e-mail e senha cadastrados no Supabase Auth</div>
+    <div class="login-hint">Use username e senha cadastrados</div>
   </div>
 </div>
 
@@ -256,17 +256,11 @@ button:active{opacity:.85}
 
 <div class="overlay" id="mOrg" onclick="closeM('mOrg')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><div class="modal-title">Criar Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
-    <div style="font-size:14px;color:#555;margin-bottom:20px;font-family:'Inter',sans-serif">
-      Como não temos acesso à Admin API do Supabase no client, siga estes passos para criar um organizador:
-    </div>
-    <div class="chk">
-      <div class="chk-item"><span style="font-size:18px">1️⃣</span><div><div style="font-size:13px;font-weight:600">Acesse o Supabase Dashboard</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Vá para seu projeto no supabase.com</div></div></div>
-      <div class="chk-item"><span style="font-size:18px">2️⃣</span><div><div style="font-size:13px;font-weight:600">Authentication → Users</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Clique em "Add user"</div></div></div>
-      <div class="chk-item"><span style="font-size:18px">3️⃣</span><div><div style="font-size:13px;font-weight:600">Preencha os dados</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">E-mail, senha e metadados (name, role: "organizer")</div></div></div>
-      <div class="chk-item"><span style="font-size:18px">4️⃣</span><div><div style="font-size:13px;font-weight:600">Insira na tabela organizers</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Adicione uma linha com id (do usuário criado), name, email</div></div></div>
-    </div>
-    <button class="btn-save" onclick="closeM('mOrg')">Entendi</button>
+    <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
+    <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
+    <label class="fl">Username</label><input class="fi" id="oUsername" placeholder="Ex: carlos_lima" autocapitalize="none">
+    <label class="fl">Senha</label><input class="fi" id="oPass" placeholder="mín. 6 caracteres" type="password">
+    <button class="btn-save" onclick="addOrganizer()">Criar Organizador</button>
   </div>
 </div>
 
@@ -299,32 +293,46 @@ function toast(msg,green=false){
 function openM(id){document.getElementById(id).classList.add("open")}
 function closeM(id){document.getElementById(id).classList.remove("open")}
 
-// ── AUTH (Supabase Auth) ──────────────────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────────────
 async function doLogin(){
-  const email=document.getElementById("loginEmail").value.trim();
+  const username=document.getElementById("loginUsername").value.trim();
   const pass=document.getElementById("loginPass").value.trim();
   const err=document.getElementById("loginErr");
   err.style.display="none";
-  if(!email||!pass)return;
+  if(!username||!pass)return;
   const btn=document.getElementById("btnLogin");
   btn.disabled=true;btn.textContent="Entrando...";
 
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){
-    err.textContent=error.message==="Invalid login credentials"?"E-mail ou senha incorretos.":error.message;
+  const {data, error} = await sb.from("organizers").select("*").eq("username", username).eq("password", pass).single();
+  if(error || !data){
+    err.textContent="Username ou senha incorretos.";
     err.style.display="block";
     btn.disabled=false;btn.textContent="Entrar";
     return;
   }
 
-  const meta=data.user.user_metadata||{};
-  currentOrg={id:data.user.id,email:data.user.email,name:meta.name||data.user.email,role:meta.role||"organizer"};
+  currentOrg = data;
+  sessionStorage.setItem("enduro_org", JSON.stringify(currentOrg));
   showApp();
 }
 
 async function doLogout(){
-  await sb.auth.signOut();
-  currentOrg=null;athletes=[];stages=[];times=[];categories=[];
+  currentOrg=null;athletes=[];stages=[];times=[];categories=[];organizers=[];
+  sessionStorage.removeItem("enduro_org");
+  document.getElementById("tabsBar").style.display="flex";
+  document.querySelector(".stats").style.display="flex";
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  document.getElementById("sc-ranking").classList.add("on");
+  document.querySelector(".tab").classList.add("on");
+  document.getElementById("secApp").style.display="none";
+  document.getElementById("secLogin").style.display="flex";
+  document.getElementById("loginUsername").value="";
+  document.getElementById("loginPass").value="";
+  document.getElementById("loginErr").style.display="none";
+  document.getElementById("btnLogin").disabled=false;
+  document.getElementById("btnLogin").textContent="Entrar";
+}
   document.getElementById("tabsBar").style.display="flex";
   document.querySelector(".stats").style.display="flex";
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
@@ -343,7 +351,7 @@ async function doLogout(){
 function showApp(){
   document.getElementById("secLogin").style.display="none";
   document.getElementById("secApp").style.display="block";
-  const isAdmin=currentOrg.role==="admin";
+  const isAdmin=currentOrg.is_admin;
   document.getElementById("tbOrg").textContent=currentOrg.name+(isAdmin?" · Admin":"");
 
   if(isAdmin){
@@ -361,11 +369,8 @@ function showApp(){
 
 // ── DADOS ─────────────────────────────────────────────────────────────────────
 async function loadAll(){
-  const isAdmin=currentOrg.role==="admin";
-  const oid=currentOrg.id;
+  const isAdmin=currentOrg.is_admin;
 
-  // Admin vê tudo via RLS (policies já filtram por organizer_id via auth.uid())
-  // Organizador comum vê só os seus (RLS cuida disso automaticamente)
   let queries = [
     sb.from("athletes").select("*").order("bib_number"),
     sb.from("stages").select("*").order("display_order"),
@@ -391,9 +396,6 @@ async function loadAll(){
   categories = results[3].data || [];
   if (isAdmin) {
     organizers = results[4].data || [];
-  }
-  if (isAdmin) {
-    // organizers = results[4].data || [];
   }
 
   renderAll();
@@ -421,7 +423,7 @@ function flashLive(){
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
-function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories();if(currentOrg.role==="admin")renderOrganizers()}
+function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories();if(currentOrg.is_admin)renderOrganizers()}
 
 function renderStats(){
   document.getElementById("stA").textContent=athletes.length;
@@ -627,10 +629,36 @@ async function removeCategory(id,name){
 }
 
 // ── ORGANIZADORES (admin) ─────────────────────────────────────────────────────
-async function removeOrganizer(id, name) {
-  if (!confirm(`Remover "${name}"?`)) return;
-  await sb.from("organizers").delete().eq("id", id);
-  organizers = organizers.filter(o => o.id !== id);
+async function addOrganizer(){
+  const name=document.getElementById("oName").value.trim();
+  const username=document.getElementById("oUsername").value.trim();
+  const pass=document.getElementById("oPass").value.trim();
+  if(!name||!username||!pass){toast("Preencha todos os campos");return}
+  if(pass.length<6){toast("Senha mín. 6 caracteres");return}
+
+  const{error}=await sb.from("organizers").insert({
+    name,
+    username,
+    password: pass,
+    is_admin: false,
+    event_code: currentOrg.event_code || ""
+  });
+  if(!error){
+    closeM("mOrg");
+    document.getElementById("oName").value="";
+    document.getElementById("oUsername").value="";
+    document.getElementById("oPass").value="";
+    toast("✓ Organizador criado",true);
+    await loadAll();
+  } else {
+    toast("Erro ao criar organizador");
+  }
+}
+
+async function removeOrganizer(id, name){
+  if(!confirm(`Remover "${name}"?`))return;
+  await sb.from("organizers").delete().eq("id",id);
+  organizers=organizers.filter(o=>o.id!==id);
   renderOrganizers();
   toast("Organizador removido");
 }
@@ -739,13 +767,11 @@ function gerarPDF(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 // Verifica sessão existente
-sb.auth.getSession().then(({data:{session}})=>{
-  if(session){
-    const meta=session.user.user_metadata||{};
-    currentOrg={id:session.user.id,email:session.user.email,name:meta.name||session.user.email,role:meta.role||"organizer"};
-    showApp();
-  }
-});
+const stored = sessionStorage.getItem("enduro_org");
+if(stored){
+  currentOrg = JSON.parse(stored);
+  showApp();
+}
 
 document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
 document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
