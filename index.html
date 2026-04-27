@@ -776,8 +776,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
   document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
-  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+    if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
 });
+
+// Garantir escopo global para handlers usados nos atributos onclick/onkeydown
+window.doLogin = doLogin;
+window.doLogout = doLogout;
+window.switchTab = switchTab;
+window.openM = openM;
+window.closeM = closeM;
+window.addAthlete = addAthlete;
+window.removeAthlete = removeAthlete;
+window.addStage = addStage;
+window.removeStage = removeStage;
+window.addCategory = addCategory;
+window.removeCategory = removeCategory;
+window.addOrganizer = addOrganizer;
+window.removeOrganizer = removeOrganizer;
+window.openEditTimes = openEditTimes;
+window.saveTimes = saveTimes;
+window.saveEvent = saveEvent;
+window.gerarPDF = gerarPDF;
+window.setCat = setCat;
 </script>
 </body>
 </html>
