@@ -341,7 +341,7 @@ async function doLogout(){
   document.querySelector(".tab").classList.add("on");
   document.getElementById("secApp").style.display="none";
   document.getElementById("secLogin").style.display="flex";
-  document.getElementById("loginEmail").value="";
+  document.getElementById("loginUsername").value="";
   document.getElementById("loginPass").value="";
   document.getElementById("loginErr").style.display="none";
   document.getElementById("btnLogin").disabled=false;
@@ -766,16 +766,18 @@ function gerarPDF(){
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-// Verifica sessão existente
-const stored = sessionStorage.getItem("enduro_org");
-if(stored){
-  currentOrg = JSON.parse(stored);
-  showApp();
-}
+document.addEventListener("DOMContentLoaded", () => {
+  // Verifica sessão existente
+  const stored = sessionStorage.getItem("enduro_org");
+  if(stored){
+    currentOrg = JSON.parse(stored);
+    showApp();
+  }
 
-document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
-document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
-if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+  document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+  document.querySelectorAll(".overlay").forEach(m=>m.addEventListener("click",()=>m.classList.remove("open")));
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+});
 </script>
 </body>
 </html>
