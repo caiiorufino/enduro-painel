@@ -256,11 +256,17 @@ button:active{opacity:.85}
 
 <div class="overlay" id="mOrg" onclick="closeM('mOrg')">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
-    <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
-    <label class="fl">E-mail</label><input class="fi" id="oEmail" placeholder="Ex: carlos@email.com" type="email" autocapitalize="none">
-    <label class="fl">Senha inicial</label><input class="fi" id="oPass" placeholder="mín. 6 caracteres" type="password">
-    <button class="btn-save" onclick="addOrganizer()">Criar Organizador</button>
+    <div class="modal-hd"><div class="modal-title">Criar Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
+    <div style="font-size:14px;color:#555;margin-bottom:20px;font-family:'Inter',sans-serif">
+      Como não temos acesso à Admin API do Supabase no client, siga estes passos para criar um organizador:
+    </div>
+    <div class="chk">
+      <div class="chk-item"><span style="font-size:18px">1️⃣</span><div><div style="font-size:13px;font-weight:600">Acesse o Supabase Dashboard</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Vá para seu projeto no supabase.com</div></div></div>
+      <div class="chk-item"><span style="font-size:18px">2️⃣</span><div><div style="font-size:13px;font-weight:600">Authentication → Users</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Clique em "Add user"</div></div></div>
+      <div class="chk-item"><span style="font-size:18px">3️⃣</span><div><div style="font-size:13px;font-weight:600">Preencha os dados</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">E-mail, senha e metadados (name, role: "organizer")</div></div></div>
+      <div class="chk-item"><span style="font-size:18px">4️⃣</span><div><div style="font-size:13px;font-weight:600">Insira na tabela organizers</div><div style="font-size:11px;color:#bbb;font-family:'DM Mono',monospace;margin-top:2px">Adicione uma linha com id (do usuário criado), name, email</div></div></div>
+    </div>
+    <button class="btn-save" onclick="closeM('mOrg')">Entendi</button>
   </div>
 </div>
 
@@ -273,7 +279,7 @@ const sb = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ocXV0c3B0eXh1cWRhYnRpb3NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTY5MTQsImV4cCI6MjA5MjQzMjkxNH0.fYM3z8G0HL6Zer7qj8HjqGIncZ4YRjCT7VSmzmFrvLA'
 );
 
-let currentOrg=null, athletes=[], stages=[], times=[], categories=[];
+let currentOrg=null, athletes=[], stages=[], times=[], categories=[], organizers=[];
 let currentCat="Todos", editingAthId=null;
 
 function fmt(ms){if(!ms)return"--:--.---";const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),r=ms%1000;return`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${String(r).padStart(3,"0")}`}
@@ -360,13 +366,36 @@ async function loadAll(){
 
   // Admin vê tudo via RLS (policies já filtram por organizer_id via auth.uid())
   // Organizador comum vê só os seus (RLS cuida disso automaticamente)
-  const[{data:a},{data:s},{data:t},{data:c}]=await Promise.all([
+  let queries = [
     sb.from("athletes").select("*").order("bib_number"),
     sb.from("stages").select("*").order("display_order"),
     sb.from("times").select("*"),
     sb.from("categories").select("*").order("name"),
-  ]);
-  athletes=a||[];stages=s||[];times=t||[];categories=c||[];
+  ];
+
+  if (currentOrg.event_id) {
+    queries[0] = queries[0].eq("event_id", currentOrg.event_id);
+    queries[1] = queries[1].eq("event_id", currentOrg.event_id);
+    queries[2] = queries[2].eq("event_id", currentOrg.event_id);
+    queries[3] = queries[3].eq("event_id", currentOrg.event_id);
+  }
+
+  if (isAdmin) {
+    queries.push(sb.from("organizers").select("*").order("name"));
+  }
+
+  const results = await Promise.all(queries);
+  athletes = results[0].data || [];
+  stages = results[1].data || [];
+  times = results[2].data || [];
+  categories = results[3].data || [];
+  if (isAdmin) {
+    organizers = results[4].data || [];
+  }
+  if (isAdmin) {
+    // organizers = results[4].data || [];
+  }
+
   renderAll();
   subscribeRealtime();
 }
@@ -392,7 +421,7 @@ function flashLive(){
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
-function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories()}
+function renderAll(){renderStats();renderRanking();renderAthletes();renderStages();renderCategories();if(currentOrg.role==="admin")renderOrganizers()}
 
 function renderStats(){
   document.getElementById("stA").textContent=athletes.length;
@@ -471,8 +500,24 @@ function renderCategories(){
     </div>`).join(""):`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhuma categoria cadastrada.</div>`;
 }
 
+function renderOrganizers(){
+  const el=document.getElementById("orgList");if(!el)return;
+  document.getElementById("orgCount").textContent=`${organizers.length} organizadores`;
+  el.innerHTML=organizers.length?organizers.map(o=>`
+    <div class="card">
+      <div class="card-l"><div class="badge">👤</div>
+        <div><div class="card-name">${o.name}</div><div class="card-meta">${o.email}</div></div>
+      </div>
+      <div class="card-r"><button class="btn-sm btn-del" onclick="removeOrganizer('${o.id}','${o.name}')">✕</button></div>
+    </div>`).join(""):`<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:'DM Mono',monospace">Nenhum organizador cadastrado.</div>`;
+}
+
 // ── ATLETAS ───────────────────────────────────────────────────────────────────
 async function addAthlete(){
+  if (!currentOrg.event_id) {
+    toast("Selecione um evento primeiro");
+    return;
+  }
   const name=document.getElementById("nName").value.trim();
   const bib=parseInt(document.getElementById("nNum").value.trim());
   const pin=document.getElementById("nPin").value.trim();
@@ -485,7 +530,7 @@ async function addAthlete(){
   if(!cat){toast("Selecione uma categoria válida");return}
 
   const{error}=await sb.from("athletes").insert({
-    event_id: currentOrg.id, // temporário até ter events table integrada
+    event_id: currentOrg.event_id,
     category_id: cat.id,
     bib_number: bib,
     name,
@@ -522,7 +567,7 @@ async function saveTimes(){
     const existing=times.find(t=>t.athlete_id===editingAthId&&t.stage_id===s.id);
     if(ms&&!existing){
       const{data}=await sb.from("times").insert({
-        event_id: currentOrg.id,
+        event_id: currentOrg.event_id,
         athlete_id: editingAthId,
         stage_id: s.id,
         type: "finish",
@@ -544,9 +589,13 @@ async function saveTimes(){
 
 // ── STAGES ────────────────────────────────────────────────────────────────────
 async function addStage(){
+  if (!currentOrg.event_id) {
+    toast("Selecione um evento primeiro");
+    return;
+  }
   const name=document.getElementById("sName").value.trim();if(!name)return;
   const{error}=await sb.from("stages").insert({
-    event_id: currentOrg.id,
+    event_id: currentOrg.event_id,
     name,
     distance_m: parseInt(document.getElementById("sDist").value)||null,
     description: document.getElementById("sDrop").value||null,
@@ -562,8 +611,12 @@ async function removeStage(id){
 
 // ── CATEGORIAS ────────────────────────────────────────────────────────────────
 async function addCategory(){
+  if (!currentOrg.event_id) {
+    toast("Selecione um evento primeiro");
+    return;
+  }
   const name=document.getElementById("cName").value.trim();if(!name)return;
-  const{error}=await sb.from("categories").insert({event_id: currentOrg.id, name});
+  const{error}=await sb.from("categories").insert({event_id: currentOrg.event_id, name});
   if(!error){closeM("mCat");document.getElementById("cName").value="";toast("✓ Categoria adicionada",true);await loadAll()}else toast("Erro ao adicionar categoria");
 }
 async function removeCategory(id,name){
@@ -574,22 +627,52 @@ async function removeCategory(id,name){
 }
 
 // ── ORGANIZADORES (admin) ─────────────────────────────────────────────────────
-async function addOrganizer(){
-  const name=document.getElementById("oName").value.trim();
-  const email=document.getElementById("oEmail").value.trim().toLowerCase();
-  const pass=document.getElementById("oPass").value.trim();
-  if(!name||!email||!pass){toast("Preencha todos os campos");return}
-  if(pass.length<6){toast("Senha mín. 6 caracteres");return}
-
-  // Cria usuário no Supabase Auth via Admin API — não disponível no client
-  // Por enquanto orienta o admin a criar manualmente
-  toast("Crie o usuário no Supabase Auth → Users → Add user, depois insira na tabela organizers.");
+async function removeOrganizer(id, name) {
+  if (!confirm(`Remover "${name}"?`)) return;
+  await sb.from("organizers").delete().eq("id", id);
+  organizers = organizers.filter(o => o.id !== id);
+  renderOrganizers();
+  toast("Organizador removido");
 }
 
 // ── EVENTO ────────────────────────────────────────────────────────────────────
-function saveEvent(){
-  const btn=document.getElementById("btnSave");btn.textContent="✓ Salvo";btn.classList.add("ok");
-  setTimeout(()=>{btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
+async function saveEvent(){
+  const name = document.getElementById("evName").value.trim();
+  const date = document.getElementById("evDate").value;
+  const location = document.getElementById("evLoc").value.trim();
+  if (!name || !date || !location) {
+    toast("Preencha todos os campos");
+    return;
+  }
+
+  const btn = document.getElementById("btnSave");
+  btn.disabled = true;
+  btn.textContent = "Salvando...";
+
+  const { data, error } = await sb.from("events").insert({
+    name,
+    date,
+    location,
+    organizer_id: currentOrg.id
+  }).select().single();
+
+  if (error) {
+    toast("Erro ao salvar evento: " + error.message);
+    btn.disabled = false;
+    btn.textContent = "Salvar Configurações";
+    return;
+  }
+
+  currentOrg.event_id = data.id;
+  btn.textContent = "✓ Salvo";
+  btn.classList.add("ok");
+  setTimeout(() => {
+    btn.textContent = "Salvar Configurações";
+    btn.classList.remove("ok");
+    btn.disabled = false;
+  }, 2000);
+  toast("✓ Evento salvo", true);
+  await loadAll(); // Recarregar dados com o novo event_id
 }
 
 function switchTab(id,el){
