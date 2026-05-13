@@ -577,12 +577,35 @@ function removeOrganizer(id){
     organizers=organizers.filter(function(o){return o.id!==id});renderOrganizers();toast("Organizador removido");
   });
 }
-
 function saveEvent(){
-  var btn=document.getElementById("btnSave");btn.textContent="✓ Salvo";btn.classList.add("ok");
-  setTimeout(function(){btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
+  var name=document.getElementById("evName").value.trim();
+  var date=document.getElementById("evDate").value;
+  var location=document.getElementById("evLoc").value.trim();
+  if(!name||!date){toast("Preencha nome e data");return}
+  var slug=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  var secret_key=Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2);
+  var btn=document.getElementById("btnSave");
+  btn.disabled=true;btn.textContent="Salvando...";
+  sb.from("events").insert({
+    name:name,
+    date:date,
+    location:location,
+    slug:slug,
+    secret_key:secret_key,
+    organizer_id:currentOrg.id
+  }).select().single().then(function(res){
+    btn.disabled=false;btn.textContent="Salvar Configurações";
+    if(!res.error){
+      currentOrg.event_id=res.data.id;
+      sessionStorage.setItem("enduro_org",JSON.stringify(currentOrg));
+      btn.textContent="✓ Salvo";btn.classList.add("ok");
+      setTimeout(function(){btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
+      toast("✓ Evento criado!",true);
+    } else {
+      toast("Erro: "+res.error.message);
+    }
+  });
 }
-
 function gerarPDF(){
   var jsPDF=window.jspdf.jsPDF;
   var doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
