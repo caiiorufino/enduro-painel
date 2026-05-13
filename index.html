@@ -331,16 +331,17 @@ function showApp(){
   document.getElementById("tbOrg").textContent=currentOrg.name+(isAdmin?" · Admin":currentOrg.event_code?" · "+currentOrg.event_code:"");
 
   if(isAdmin){
-    // Admin vê só aba Admin
+    // Admin vê só aba Admin, sem PDF/ao vivo
     document.getElementById("tabsBar").style.display="none";
     document.querySelector(".stats").style.display="none";
+    document.querySelector(".tb-right").style.display="none";
     document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});
     document.getElementById("sc-admin").classList.add("on");
   } else {
-    // Organizador vê abas normais, sem Admin
+    // Organizador vê abas normais, com PDF/ao vivo
     document.getElementById("tabsBar").style.display="flex";
     document.querySelector(".stats").style.display="flex";
-    // Garante que tab-admin não existe para organizadores
+    document.querySelector(".tb-right").style.display="flex";
     var at=document.getElementById("tab-admin");if(at)at.remove();
   }
   loadAll();
@@ -364,7 +365,7 @@ function loadAll(){
   var qS=sb.from("stages").select("*").order("id");
   var qT=sb.from("times").select("*");
   var qC=sb.from("categories").select("*").order("name");
-  if(!isAdmin){qA=qA.eq("organizer_id",oid);qS=qS.eq("organizer_id",oid);qT=qT.eq("organizer_id",oid);qC=qC.eq("organizer_id",oid)}
+  if(!isAdmin&&currentOrg.event_id){qA=qA.eq("event_id",currentOrg.event_id);qS=qS.eq("event_id",currentOrg.event_id);qT=qT.eq("event_id",currentOrg.event_id);qC=qC.eq("event_id",currentOrg.event_id)}
   Promise.all([qA,qS,qT,qC]).then(function(results){
     athletes=results[0].data||[];stages=results[1].data||[];times=results[2].data||[];categories=results[3].data||[];
     if(isAdmin){
@@ -442,7 +443,7 @@ function renderAthletes(){
   document.getElementById("athList").innerHTML=athletes.length?athletes.map(function(a){
     return'<div class="card"><div class="card-l"><div class="badge">#'+a.number+'</div>'+
       '<div><div class="card-name">'+a.name+'</div>'+
-      '<div class="card-meta">'+(a.category||"—")+' · '+doneCount(a)+'/'+stages.length+' stages · PIN: <span style="color:#E8593C">'+a.pin+'</span></div></div></div>'+
+      '<div class="card-meta">'+(a.category||"—")+' · '+doneCount(a)+'/'+stages.length+' stages · PIN: <span style="color:#E8593C">'+(a.pin_hash?a.pin_hash.replace("__pin__",""):"••••")+'</span></div></div></div>'+
       '<div class="card-r"><button class="btn-sm" onclick="openEditTimes('+a.id+')">⏱ Tempos</button>'+
       '<button class="btn-sm btn-del" onclick="removeAthlete('+a.id+')">✕</button></div></div>';
   }).join(""):'<div style="text-align:center;color:#bbb;font-size:13px;padding:30px;font-family:monospace">Nenhum atleta cadastrado.</div>';
@@ -492,14 +493,23 @@ function renderOrganizers(){
 
 function addAthlete(){
   var name=document.getElementById("nName").value.trim();
-  var number=document.getElementById("nNum").value.trim();
+  var bib=document.getElementById("nNum").value.trim();
   var pin=document.getElementById("nPin").value.trim();
-  var category=document.getElementById("nCat").value;
-  if(!name||!number||!pin){toast("Preencha todos os campos");return}
-  if(athletes.find(function(a){return a.number==number})){toast("⚠️ Número #"+number+" já em uso");return}
-  sb.from("athletes").insert({name:name,number:number,category:category,pin:pin,organizer_id:currentOrg.id}).then(function(res){
+  var catName=document.getElementById("nCat").value;
+  if(!name||!bib||!pin){toast("Preencha todos os campos");return}
+  if(athletes.find(function(a){return String(a.bib_number)==String(bib)})){toast("⚠️ Número #"+bib+" já em uso");return}
+  var cat=categories.find(function(c){return c.name===catName});
+  if(!cat){toast("Selecione uma categoria válida");return}
+  if(!currentOrg.event_id){toast("Crie um evento primeiro");return}
+  sb.from("athletes").insert({
+    name:name,
+    bib_number:parseInt(bib),
+    pin_hash:"__pin__"+pin,
+    category_id:cat.id,
+    event_id:currentOrg.event_id
+  }).then(function(res){
     if(!res.error){closeM("mAth");document.getElementById("nName").value="";document.getElementById("nNum").value="";document.getElementById("nPin").value="";toast("✓ Atleta cadastrado",true);loadAll()}
-    else toast("Erro ao cadastrar atleta");
+    else toast("Erro: "+res.error.message);
   });
 }
 
@@ -531,7 +541,7 @@ function saveTimes(){
     var ms=parseFmt(val);
     var existing=times.find(function(t){return t.athlete_id===editingAthId&&t.stage_id===s.id});
     if(ms&&!existing){
-      return sb.from("times").insert({athlete_id:editingAthId,stage_id:s.id,time_ms:ms,organizer_id:currentOrg.id}).select().single().then(function(res){if(res.data)times.push(res.data)});
+      return sb.from("times").insert({athlete_id:editingAthId,stage_id:s.id,time_ms:ms,organizer_id:currentOrg.id,event_id:currentOrg.event_id}).select().single().then(function(res){if(res.data)times.push(res.data)});
     } else if(ms&&existing){
       return sb.from("times").update({time_ms:ms}).eq("id",existing.id).then(function(){existing.time_ms=ms});
     } else if(!ms&&existing){
@@ -544,7 +554,7 @@ function saveTimes(){
 
 function addStage(){
   var name=document.getElementById("sName").value.trim();if(!name)return;
-  sb.from("stages").insert({name:name,distance:document.getElementById("sDist").value,drop_meters:document.getElementById("sDrop").value,organizer_id:currentOrg.id}).then(function(res){
+  sb.from("stages").insert({name:name,event_id:currentOrg.event_id,distance_m:parseInt(document.getElementById("sDist").value)||null,description:document.getElementById("sDrop").value||null,display_order:stages.length}).then(function(res){
     if(!res.error){closeM("mStg");document.getElementById("sName").value="";document.getElementById("sDist").value="";document.getElementById("sDrop").value="";toast("✓ Stage adicionado",true);loadAll()}
     else toast("Erro ao adicionar stage");
   });
@@ -561,7 +571,7 @@ function removeStage(id){
 
 function addCategory(){
   var name=document.getElementById("cName").value.trim();if(!name)return;
-  sb.from("categories").insert({name:name,organizer_id:currentOrg.id}).then(function(res){
+  sb.from("categories").insert({name:name,event_id:currentOrg.event_id}).then(function(res){
     if(!res.error){closeM("mCat");document.getElementById("cName").value="";toast("✓ Categoria adicionada",true);loadAll()}
     else toast("Erro ao adicionar categoria");
   });
