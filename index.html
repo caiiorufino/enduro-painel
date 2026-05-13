@@ -232,8 +232,6 @@ button:active{opacity:.85}
 <div class="overlay" id="mOrg" onclick="closeM('mOrg')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
-    <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
-    <label class="fl">E-mail</label><input class="fi" id="oEmail" placeholder="Ex: carlos@email.com" type="email">
     <label class="fl">Usuário</label><input class="fi" id="oUser" placeholder="Ex: carlos" autocapitalize="none">
     <label class="fl">Senha</label><input class="fi" id="oPass" placeholder="Ex: enduro2025">
     <label class="fl">Código do Evento</label><input class="fi" id="oCode" placeholder="Ex: ENDURO25" style="text-transform:uppercase">
@@ -359,19 +357,30 @@ function changePassword(){
 }
 
 function loadAll(){
-  var oid=currentOrg.id;
   var isAdmin=currentOrg.is_admin;
-  var qA=sb.from("athletes").select("*").order("number");
-  var qS=sb.from("stages").select("*").order("id");
-  var qT=sb.from("times").select("*");
-  var qC=sb.from("categories").select("*").order("name");
-  if(!isAdmin&&currentOrg.event_id){qA=qA.eq("event_id",currentOrg.event_id);qS=qS.eq("event_id",currentOrg.event_id);qT=qT.eq("event_id",currentOrg.event_id);qC=qC.eq("event_id",currentOrg.event_id)}
-  Promise.all([qA,qS,qT,qC]).then(function(results){
-    athletes=results[0].data||[];stages=results[1].data||[];times=results[2].data||[];categories=results[3].data||[];
-    if(isAdmin){
-      sb.from("organizers").select("*").order("name").then(function(res){organizers=res.data||[];renderAll()});
-    } else {renderAll()}
-    subscribeRealtime();
+  if(isAdmin){
+    sb.from("organizers").select("*").order("name").then(function(res){organizers=res.data||[];renderAll()});
+    return;
+  }
+  // Busca evento do organizador automaticamente
+  sb.from("events").select("*").eq("organizer_id",currentOrg.id).order("created_at",{ascending:false}).limit(1).then(function(evRes){
+    if(evRes.data&&evRes.data.length>0){
+      var ev=evRes.data[0];
+      currentOrg.event_id=ev.id;
+      currentOrg.event_name=ev.name;
+      sessionStorage.setItem("enduro_org",JSON.stringify(currentOrg));
+    }
+    var eid=currentOrg.event_id;
+    if(!eid){athletes=[];stages=[];times=[];categories=[];renderAll();return}
+    Promise.all([
+      sb.from("athletes").select("*").eq("event_id",eid).order("bib_number"),
+      sb.from("stages").select("*").eq("event_id",eid).order("display_order"),
+      sb.from("times").select("*").eq("event_id",eid),
+      sb.from("categories").select("*").eq("event_id",eid).order("name")
+    ]).then(function(results){
+      athletes=results[0].data||[];stages=results[1].data||[];times=results[2].data||[];categories=results[3].data||[];
+      renderAll();subscribeRealtime();
+    });
   });
 }
 
@@ -586,30 +595,45 @@ function removeCategory(id,name){
 }
 
 function addOrganizer(){
-  var name=document.getElementById("oName").value.trim();
   var username=document.getElementById("oUser").value.trim().toLowerCase().replace(/\s+/g,"_");
   var password=document.getElementById("oPass").value.trim();
   var code=document.getElementById("oCode").value.trim().toUpperCase();
-  if(!name||!username||!password||!code){toast("Preencha todos os campos");return}
+  if(!username||!password||!code){toast("Preencha todos os campos");return}
   sb.from("organizers").select("id,username,event_code").then(function(res){
     var dup=res.data||[];
     if(dup.some(function(o){return o.username===username})){toast("⚠️ Usuário já cadastrado");return}
     if(dup.some(function(o){return o.event_code===code})){toast("⚠️ Código já em uso");return}
-    sb.from("organizers").insert({name:name,email:document.getElementById("oEmail").value.trim(),username:username,password:password,is_admin:false,event_code:code}).then(function(res2){
-      if(!res2.error){
+    // Cria organizador
+    sb.from("organizers").insert({name:username,username:username,password:password,is_admin:false,event_code:code}).select().single().then(function(res2){
+      if(res2.error){toast("Erro ao criar organizador: "+res2.error.message);return}
+      var org=res2.data;
+      // Cria evento automaticamente para o organizador
+      var slug=code.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+      var secret=Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2);
+      sb.from("events").insert({
+        organizer_id:org.id,
+        name:code,
+        slug:slug+"-"+Date.now(),
+        date:new Date().toISOString().split("T")[0],
+        secret_key:secret
+      }).select().single().then(function(evRes){
+        if(evRes.error){toast("Organizador criado mas erro no evento: "+evRes.error.message);return}
         closeM("mOrg");
-        ["oName","oEmail","oUser","oPass","oCode"].forEach(function(id){document.getElementById(id).value=""});
-        toast("✓ Organizador criado",true);
+        ["oUser","oPass","oCode"].forEach(function(id){document.getElementById(id).value=""});
+        toast("✓ Organizador e evento criados!",true);
         sb.from("organizers").select("*").order("name").then(function(r){organizers=r.data||[];renderOrganizers()});
-      } else toast("Erro ao criar organizador");
+      });
     });
   });
 }
 
 function removeOrganizer(id){
-  if(!confirm("Remover organizador?"))return;
-  sb.from("organizers").delete().eq("id",id).then(function(){
-    organizers=organizers.filter(function(o){return o.id!==id});renderOrganizers();toast("Organizador removido");
+  if(!confirm("Remover organizador e todos os seus dados?"))return;
+  sb.from("events").delete().eq("organizer_id",id).then(function(){
+    sb.from("organizers").delete().eq("id",id).then(function(){
+      organizers=organizers.filter(function(o){return o.id!==id});
+      renderOrganizers();toast("Organizador removido");
+    });
   });
 }
 
