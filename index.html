@@ -233,6 +233,7 @@ button:active{opacity:.85}
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd"><div class="modal-title">Novo Organizador</div><button class="modal-x" onclick="closeM('mOrg')">✕</button></div>
     <label class="fl">Nome</label><input class="fi" id="oName" placeholder="Ex: Carlos Lima">
+    <label class="fl">E-mail</label><input class="fi" id="oEmail" placeholder="Ex: carlos@email.com" type="email">
     <label class="fl">Usuário</label><input class="fi" id="oUser" placeholder="Ex: carlos" autocapitalize="none">
     <label class="fl">Senha</label><input class="fi" id="oPass" placeholder="Ex: enduro2025">
     <label class="fl">Código do Evento</label><input class="fi" id="oCode" placeholder="Ex: ENDURO25" style="text-transform:uppercase">
@@ -584,10 +585,10 @@ function addOrganizer(){
     var dup=res.data||[];
     if(dup.some(function(o){return o.username===username})){toast("⚠️ Usuário já cadastrado");return}
     if(dup.some(function(o){return o.event_code===code})){toast("⚠️ Código já em uso");return}
-    sb.from("organizers").insert({name:name,username:username,password:password,is_admin:false,event_code:code}).then(function(res2){
+    sb.from("organizers").insert({name:name,email:document.getElementById("oEmail").value.trim(),username:username,password:password,is_admin:false,event_code:code}).then(function(res2){
       if(!res2.error){
         closeM("mOrg");
-        ["oName","oUser","oPass","oCode"].forEach(function(id){document.getElementById(id).value=""});
+        ["oName","oEmail","oUser","oPass","oCode"].forEach(function(id){document.getElementById(id).value=""});
         toast("✓ Organizador criado",true);
         sb.from("organizers").select("*").order("name").then(function(r){organizers=r.data||[];renderOrganizers()});
       } else toast("Erro ao criar organizador");
