@@ -327,11 +327,19 @@ function showApp(){
   document.getElementById("secApp").style.display="block";
   var isAdmin=currentOrg.is_admin;
   document.getElementById("tbOrg").textContent=currentOrg.name+(isAdmin?" · Admin":currentOrg.event_code?" · "+currentOrg.event_code:"");
-  if(isAdmin&&!document.getElementById("tab-admin")){
-    var t=document.createElement("button");
-    t.className="tab";t.id="tab-admin";t.textContent="👑 Admin";
-    t.setAttribute("onclick","switchTab('admin',this)");
-    document.getElementById("tabsBar").appendChild(t);
+
+  if(isAdmin){
+    // Admin vê só aba Admin
+    document.getElementById("tabsBar").style.display="none";
+    document.querySelector(".stats").style.display="none";
+    document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});
+    document.getElementById("sc-admin").classList.add("on");
+  } else {
+    // Organizador vê abas normais, sem Admin
+    document.getElementById("tabsBar").style.display="flex";
+    document.querySelector(".stats").style.display="flex";
+    // Garante que tab-admin não existe para organizadores
+    var at=document.getElementById("tab-admin");if(at)at.remove();
   }
   loadAll();
 }
@@ -421,6 +429,11 @@ function renderRanking(){
 }
 
 function renderAthletes(){
+  if(!currentOrg.event_id){
+    document.getElementById("athList").innerHTML='<div style="text-align:center;padding:40px 20px;color:#bbb;font-family:'DM Mono',monospace;font-size:13px">⚙️ Crie um evento primeiro na aba Evento.</div>';
+    document.getElementById("athCount").textContent="";
+    return;
+  }
   document.getElementById("athCount").textContent=athletes.length+" atletas inscritos";
   var sel=document.getElementById("nCat");
   if(sel)sel.innerHTML=categories.map(function(c){return'<option value="'+c.name+'">'+c.name+'</option>'}).join("")||'<option value="">Sem categorias</option>';
@@ -434,6 +447,11 @@ function renderAthletes(){
 }
 
 function renderStages(){
+  if(!currentOrg.event_id){
+    document.getElementById("stgList").innerHTML='<div style="text-align:center;padding:40px 20px;color:#bbb;font-family:'DM Mono',monospace;font-size:13px">⚙️ Crie um evento primeiro na aba Evento.</div>';
+    document.getElementById("stgCount").textContent="";
+    return;
+  }
   document.getElementById("stgCount").textContent=stages.length+" stages";
   document.getElementById("stgList").innerHTML=stages.length?stages.map(function(s,i){
     return'<div class="card"><div class="card-l"><div class="badge">S'+(i+1)+'</div>'+
@@ -445,6 +463,11 @@ function renderStages(){
 
 function renderCategories(){
   var el=document.getElementById("catList");if(!el)return;
+  if(!currentOrg.event_id){
+    el.innerHTML='<div style="text-align:center;padding:40px 20px;color:#bbb;font-family:'DM Mono',monospace;font-size:13px">⚙️ Crie um evento primeiro na aba Evento.</div>';
+    document.getElementById("catCount").textContent="";
+    return;
+  }
   document.getElementById("catCount").textContent=categories.length+" categorias";
   el.innerHTML=categories.length?categories.map(function(c){
     return'<div class="card"><div class="card-l"><div class="badge">🏷</div>'+
@@ -577,35 +600,12 @@ function removeOrganizer(id){
     organizers=organizers.filter(function(o){return o.id!==id});renderOrganizers();toast("Organizador removido");
   });
 }
+
 function saveEvent(){
-  var name=document.getElementById("evName").value.trim();
-  var date=document.getElementById("evDate").value;
-  var location=document.getElementById("evLoc").value.trim();
-  if(!name||!date){toast("Preencha nome e data");return}
-  var slug=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-  var secret_key=Math.random().toString(36).substring(2)+Math.random().toString(36).substring(2);
-  var btn=document.getElementById("btnSave");
-  btn.disabled=true;btn.textContent="Salvando...";
-  sb.from("events").insert({
-    name:name,
-    date:date,
-    location:location,
-    slug:slug,
-    secret_key:secret_key,
-    organizer_id:currentOrg.id
-  }).select().single().then(function(res){
-    btn.disabled=false;btn.textContent="Salvar Configurações";
-    if(!res.error){
-      currentOrg.event_id=res.data.id;
-      sessionStorage.setItem("enduro_org",JSON.stringify(currentOrg));
-      btn.textContent="✓ Salvo";btn.classList.add("ok");
-      setTimeout(function(){btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
-      toast("✓ Evento criado!",true);
-    } else {
-      toast("Erro: "+res.error.message);
-    }
-  });
+  var btn=document.getElementById("btnSave");btn.textContent="✓ Salvo";btn.classList.add("ok");
+  setTimeout(function(){btn.textContent="Salvar Configurações";btn.classList.remove("ok")},2000);
 }
+
 function gerarPDF(){
   var jsPDF=window.jspdf.jsPDF;
   var doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
